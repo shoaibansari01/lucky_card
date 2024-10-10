@@ -4,10 +4,12 @@ const express = require("express");
 const connectDB = require("./config/database");
 const superAdminRoutes = require("./routes/superAdminRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+const cors = require('cors');
 
 const app = express();
 
 connectDB();
+app.use(cors());
 
 app.use(express.json());
 
