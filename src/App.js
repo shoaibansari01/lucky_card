@@ -1,25 +1,30 @@
-import logo from './logo.svg';
+
 import './App.css';
+import './index.css';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import SuperAdmin from './components/SuperAdmin';
+import CreateAdmin from './components/CreateAdmin';
+import Successfull from './components/Successfull';
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+     <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<SuperAdmin />}></Route>
+          <Route path="/create" element={<CreateAdmin />}></Route>
+          <Route path="/success" element={<Successfull />}></Route>
+
+        </Routes>
+      </BrowserRouter>
     </div>
+    
   );
 }
 
 export default App;
+
+
+
+ 
+    
