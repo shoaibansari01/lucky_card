@@ -6,6 +6,7 @@ const {
   verifyOTP,
   forgotPassword,
   resetPassword,
+  getAllAdmins,
 } = require("../controllers/adminController");
 const { authSuperAdmin } = require("../middleware/auth");
 
@@ -16,5 +17,6 @@ router.post("/login", login);
 router.post("/verify-otp", verifyOTP);
 router.post("/forgot-password", forgotPassword);
 router.post("/reset-password", resetPassword);
+router.get("/all-admins", authSuperAdmin, getAllAdmins);
 
 module.exports = router;
