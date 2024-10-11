@@ -17,6 +17,5 @@ router.post("/login", login);
 router.post("/verify-otp", verifyOTP);
 router.post("/forgot-password", forgotPassword);
 router.post("/reset-password", resetPassword);
-router.get("/all-admins", authSuperAdmin, getAllAdmins);
 
 module.exports = router;

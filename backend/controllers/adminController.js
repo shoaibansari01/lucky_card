@@ -35,11 +35,9 @@ exports.create = async (req, res) => {
 
     await sendOTP(email, otp);
 
-    res
-      .status(201)
-      .send({
-        message: "Admin created. Please verify your email with the OTP sent.",
-      });
+    res.status(201).send({
+      message: "Admin created. Please verify your email with the OTP sent.",
+    });
   } catch (error) {
     res.status(400).send(error);
   }
@@ -135,23 +133,5 @@ exports.resetPassword = async (req, res) => {
     res.send({ message: "Password reset successfully" });
   } catch (error) {
     res.status(400).send(error);
-  }
-};
-
-exports.getAllAdmins = async (req, res) => {
-  try {
-    const admins = await Admin.find({}, "name email createdAt password");
-
-    const adminData = admins.map((admin) => ({
-      name: admin.name,
-      email: admin.email,
-      creationDate: admin.createdAt,
-      password: admin.password.replace(/./g, "*").slice(0, 10) + "...", // Mask the password
-    }));
-
-    res.status(200).json(adminData);
-  } catch (error) {
-    console.error("Error fetching admins:", error);
-    res.status(500).json({ error: "Internal server error" });
   }
 };
