@@ -2,108 +2,93 @@ import { v4 as uuidv4 } from 'uuid';
 import Card from '../models/cardModel.js';
 import SelectedCard from '../models/selectedCardModel.js';
 import Timer from '../models/timerModel.js';
+import Game from '../models/gameModel.js';
 
 // Initialize the cards with IDs and amounts
 export const initializeCards = async (req, res) => {
     try {
-        const cards = [];
-        for (let i = 1; i <= 12; i++) {
-            cards.push({ cardId: `00${i}`, amount: i + 1 }); // Amount is set as i+1 (i.e., 2, 3, ..., 12)
-        }
-        await Card.insertMany(cards);
-        res.status(201).json({ message: 'Cards initialized', cards });
+        // Define the game data
+        const gamesData = [
+            {
+                GameId: 1,
+                Bets: [
+                    {
+                        AdminId: 1,
+                        Bet: {
+                            Ticket1: {
+                                card1: [2],
+                                card2: [5],
+                                card3: [3]
+                            },
+                            Ticket2: {
+                                card1: [5],
+                                card2: [4],
+                                card3: [2]
+                            },
+                            Ticket3: {
+                                card1: [10],
+                                card2: [5],
+                                card3: [2]
+                            }
+                        }
+                    },
+                    {
+                        AdminId: 2,
+                        Bet: {
+                            Ticket1: {
+                                card1: [5],
+                                card2: [4],
+                                card3: [10]
+                            },
+                            Ticket2: {
+                                card1: [5],
+                                card2: [6],
+                                card3: [8]
+                            },
+                            Ticket3: {
+                                card1: [10],
+                                card2: [5],
+                                card3: [2]
+                            }
+                        }
+                    },
+                    {
+                        AdminId: 3,
+                        Bet: {
+                            Ticket1: {
+                                card1: [5],
+                                card2: [4],
+                                card3: [10]
+                            },
+                            Ticket2: {
+                                card1: [5],
+                                card2: [6],
+                                card3: [8]
+                            },
+                            Ticket3: {
+                                card1: [10],
+                                card2: [5],
+                                card3: [2]
+                            }
+                        }
+                    }
+                ]
+            }
+        ];
+
+        // Insert game data into the database
+        await Game.insertMany(gamesData);
+        res.status(201).json({ message: 'Games initialized', games: gamesData });
     } catch (err) {
-        res.status(500).json({ message: 'Error initializing cards', error: err.message });
+        res.status(500).json({ message: 'Error initializing games', error: err.message });
     }
 };
 
-// Calculate total amount and find the lowest card
-// export const calculateAmounts = async (req, res) => {
-//     try {
-//         const cards = await Card.find();
-
-//         // Total amount of all cards
-//         const totalAmount = cards.reduce((acc, card) => acc + card.amount, 0);
-
-//         // Calculate 85% of totalAmount
-//         const percAmount = totalAmount * 0.85;
-
-//         // Calculate amounts for all cards based on the multipliers
-//         const amounts = cards.map(card => ({
-//             cardId: card.cardId,
-//             originalAmount: card.amount,
-//             '2X': card.amount * 20,
-//             '3X': card.amount * 30,
-//             '5X': card.amount * 50,
-//         }));
-
-//         // Filter amounts for each multiplier, checking against percAmount
-//         const validAmounts = {};
-
-//         // Group valid amounts by multiplier
-//         amounts.forEach(item => {
-//             if (item['2X'] < percAmount) {
-//                 validAmounts[item['2X']] = validAmounts[item['2X']] || [];
-//                 validAmounts[item['2X']].push({ ...item, multiplier: '2X', amount: item['2X'] });
-//             }
-//             if (item['3X'] < percAmount) {
-//                 validAmounts[item['3X']] = validAmounts[item['3X']] || [];
-//                 validAmounts[item['3X']].push({ ...item, multiplier: '3X', amount: item['3X'] });
-//             }
-//             if (item['5X'] < percAmount) {
-//                 validAmounts[item['5X']] = validAmounts[item['5X']] || [];
-//                 validAmounts[item['5X']].push({ ...item, multiplier: '5X', amount: item['5X'] });
-//             }
-//         });
-
-//         // Flatten valid amounts into an array
-//         const flatValidAmounts = Object.values(validAmounts).flat();
-
-//         // Randomly select one valid amount
-//         let selectedAmount = null;
-//         if (flatValidAmounts.length > 0) {
-//             const randomIndex = Math.floor(Math.random() * flatValidAmounts.length);
-//             selectedAmount = flatValidAmounts[randomIndex];
-//         }
-
-//         // Store the selected card in the database if there's a valid selection
-//         if (selectedAmount) {
-//             const uniqueId = uuidv4(); // Generate a unique ID for the selected card
-//             const selectedCardData = {
-//                 id: uniqueId,
-//                 cardId: selectedAmount.cardId,
-//                 multiplier: selectedAmount.multiplier,
-//                 amount: selectedAmount.amount,
-//                 originalAmount: selectedAmount.originalAmount,
-//             };
-
-//             // Save the selected card data to the database
-//             const selectedCard = new SelectedCard(selectedCardData);
-//             await selectedCard.save();
-//         }
-
-//         // Retrieve all previously selected cards from the database
-//         const previousSelectedCards = await SelectedCard.find();
-
-//         res.status(200).json({
-//             totalAmount,
-//             percAmount,
-//             validAmounts: flatValidAmounts, // Return the flattened valid amounts
-//             selectedAmount: selectedAmount ? { multiplier: selectedAmount.multiplier, amount: selectedAmount.amount, cardId: selectedAmount.cardId } : null, // Return the selected amount
-//             previousSelectedCards, // Return all previous selected cards
-//         });
-//     } catch (err) {
-//         res.status(500).json({ message: 'Error calculating amounts', error: err.message });
-//     }
-// };
-
 let timerInterval;  // Store the interval globally
-
-// Function to start the timer and check if calculation can start
-export const startTimer = async () => {
+// Function to start the timer
+export const startTimer = async (io) => {
     let timer = await Timer.findOne({ timerId: 'game-timer' });
 
-    // If no timer is found, create one with 30 seconds remaining
     if (!timer) {
         timer = new Timer({ timerId: 'game-timer', remainingTime: 30, isRunning: true });
         await timer.save();
@@ -111,56 +96,41 @@ export const startTimer = async () => {
 
     timer.isRunning = true;
     await timer.save();
+    io.emit('timerUpdate', { remainingTime: timer.remainingTime, isRunning: timer.isRunning });
 
-    timerInterval = setInterval(async () => {
+    const timerInterval = setInterval(async () => {
         if (timer.remainingTime > 0) {
             timer.remainingTime -= 1;
             await timer.save();
+
+            // Emit real-time update to all clients
+            io.emit('timerUpdate', { remainingTime: timer.remainingTime, isRunning: timer.isRunning });
         } else {
-            clearInterval(timerInterval);  // Stop the timer when it reaches 0
+            clearInterval(timerInterval);
+            timer.isRunning = false;
+            await timer.save();
+
+            // Emit timer stop event
+            io.emit('timerUpdate', { remainingTime: 0, isRunning: false });
         }
     }, 1000);
 };
-// export const startTimer = async (req, res) => {
-//     let timer = await Timer.findOne({ timerId: 'game-timer' });
 
-//     // If no timer is found, create one with 30 seconds remaining
-//     if (!timer) {
-//         timer = new Timer({ timerId: 'game-timer', remainingTime: 30, isRunning: true });
-//         await timer.save();
-//     }
-
-//     if (timer.isRunning) {
-//         return res.status(200).json({ message: 'Timer is already running.' });
-//     }
-
-//     timer.isRunning = true;
-//     await timer.save();
-
-//     res.status(200).json({ message: 'Timer started with 30 seconds remaining' });
-
-//     // Start the interval but don't block the response
-//     timerInterval = setInterval(async () => {
-//         if (timer.remainingTime > 0) {
-//             timer.remainingTime -= 1;
-//             await timer.save();
-//         } else {
-//             clearInterval(timerInterval);  // Stop the timer when it reaches 0
-//             // timer.isRunning = false;
-//             // await timer.save();
-//         }
-//     }, 1000);
-// };
-
-export const resetTimer = async () => {
+// Function to reset the timer
+export const resetTimer = async (io) => {
     let timer = await Timer.findOne({ timerId: 'game-timer' });
+
     if (timer) {
-        timer.remainingTime = 30;  // Reset timer to 30 seconds
+        timer.remainingTime = 30;
         await timer.save();
-        startTimer();  // Restart the timer
+
+        // Restart the timer after resetting
+        startTimer(io);
+        io.emit('timerUpdate', { remainingTime: timer.remainingTime, isRunning: true });
     }
 };
 
+// Function to get the current timer state
 export const getTimer = async (req, res) => {
     try {
         const timer = await Timer.findOne({ timerId: 'game-timer' });
@@ -178,95 +148,147 @@ export const getTimer = async (req, res) => {
     }
 };
 
-// Function to perform the calculation when the timer reaches 10 seconds
 export const calculateAmounts = async (req, res) => {
     try {
-        let timer = await Timer.findOne({ timerId: 'game-timer' });
+        console.log("Starting the calculation process...");
 
-        // Wait until the timer reaches 10 seconds
-        if (timer.remainingTime > 10 || !timer.isRunning) {
+        // Fetch the timer from the database
+        const timer = await Timer.findOne({ timerId: 'game-timer' });
+        console.log(`Fetched timer: ${JSON.stringify(timer)}`);
+
+        // Check if the timer is running and the remaining time is <= 10 seconds
+        if (!timer.isRunning || timer.remainingTime > 10) {
+            console.log(`Waiting for the timer to reach 10 seconds... Current time: ${timer.remainingTime}`);
             return res.status(200).json({ message: `Waiting for the timer to reach 10 seconds... Current time: ${timer.remainingTime}` });
         }
 
-        // Stop the timer before starting the calculation
-        clearInterval(timerInterval);
+        // Stop the timer
+        clearInterval(timerInterval);  // Assumes there's a running interval
         timer.isRunning = false;
         await timer.save();
+        console.log(`Timer stopped at ${timer.remainingTime}`);
 
-        // Fetch cards and perform the calculation
-        const cards = await Card.find();
+        // Fetch games from the database with lean() to avoid Mongoose document wrapper
+        const games = await Game.find().lean();
+        console.log(`Fetched games: ${JSON.stringify(games)}`);
 
-        // Total amount of all cards
-        const totalAmount = cards.reduce((acc, card) => acc + card.amount, 0);
+        for (const game of games) {
+            console.log(`Processing game: ${game.GameId}`);
 
-        // Calculate 85% of totalAmount
-        const percAmount = totalAmount * 0.85;
+            // Iterate over each bet within the game
+            for (const bet of game.Bets) {
+                console.log(`Processing bet for AdminId: ${bet.AdminId}`);
+                const validAmounts = processGameBets(bet.Bet);
+                
+                const selectedAmount = selectRandomAmount(validAmounts);
 
-        // Calculate amounts for all cards based on the multipliers
-        const amounts = cards.map(card => ({
-            cardId: card.cardId,
-            originalAmount: card.amount,
-            '2X': card.amount * 20,
-            '3X': card.amount * 30,
-            '5X': card.amount * 50,
-        }));
-
-        // Filter amounts for each multiplier, checking against percAmount
-        const validAmounts = {};
-        amounts.forEach(item => {
-            if (item['2X'] < percAmount) {
-                validAmounts[item['2X']] = validAmounts[item['2X']] || [];
-                validAmounts[item['2X']].push({ ...item, multiplier: '2X', amount: item['2X'] });
+                if (selectedAmount) {
+                    await saveSelectedCard(selectedAmount, game.GameId);
+                }
             }
-            if (item['3X'] < percAmount) {
-                validAmounts[item['3X']] = validAmounts[item['3X']] || [];
-                validAmounts[item['3X']].push({ ...item, multiplier: '3X', amount: item['3X'] });
-            }
-            if (item['5X'] < percAmount) {
-                validAmounts[item['5X']] = validAmounts[item['5X']] || [];
-                validAmounts[item['5X']].push({ ...item, multiplier: '5X', amount: item['5X'] });
-            }
-        });
-
-        // Flatten valid amounts into an array
-        const flatValidAmounts = Object.values(validAmounts).flat();
-
-        // Randomly select one valid amount
-        let selectedAmount = null;
-        if (flatValidAmounts.length > 0) {
-            const randomIndex = Math.floor(Math.random() * flatValidAmounts.length);
-            selectedAmount = flatValidAmounts[randomIndex];
         }
 
-        // Store the selected card in the database if there's a valid selection
-        if (selectedAmount) {
-            const uniqueId = uuidv4(); // Generate a unique ID for the selected card
-            const selectedCardData = {
-                id: uniqueId,
-                cardId: selectedAmount.cardId,
-                multiplier: selectedAmount.multiplier,
-                amount: selectedAmount.amount,
-                originalAmount: selectedAmount.originalAmount,
-            };
-
-            const selectedCard = new SelectedCard(selectedCardData);
-            await selectedCard.save();
-        }
-
-        // Retrieve all previously selected cards from the database
         const previousSelectedCards = await SelectedCard.find();
+        console.log(`Retrieved previous selected cards: ${JSON.stringify(previousSelectedCards)}`);
 
-        // After calculation, reset the timer and start it again
-        await resetTimer();
+        // Emit timer update
+        req.io.emit('timerUpdate', { remainingTime: timer.remainingTime, isRunning: timer.isRunning });
+        console.log("Emitted timer update");
+
+        await resetTimer(req.io);
+        console.log("Timer reset");
 
         res.status(200).json({
-            totalAmount,
-            percAmount,
-            validAmounts: flatValidAmounts, // Return the flattened valid amounts
-            selectedAmount: selectedAmount ? { multiplier: selectedAmount.multiplier, amount: selectedAmount.amount, cardId: selectedAmount.cardId } : null, // Return the selected amount
-            previousSelectedCards, // Return all previous selected cards
+            message: 'Amounts calculated successfully',
+            previousSelectedCards,  // Return all previously selected cards
         });
+
     } catch (err) {
+        console.error(`Error during calculation: ${err.message}`);
         res.status(500).json({ message: 'Error calculating amounts', error: err.message });
     }
+};
+
+// Function to process the bets of each game
+const processGameBets = (bet) => {
+    let totalAmount = 0;
+    const amounts = [];
+
+    // Process tickets in the bet
+    for (const ticketKey in bet) {
+        const ticket = bet[ticketKey];
+        console.log(`Processing ${ticketKey}`);
+
+        // Access cards in the ticket
+        for (const cardKey in ticket) {
+            if (Array.isArray(ticket[cardKey])) {
+                // Ensure the card amount is a number and process it
+                const cardAmount = Number(ticket[cardKey][0]);  // Convert to number
+                if (!isNaN(cardAmount)) {
+                    totalAmount += cardAmount;
+                    console.log(`Card: ${cardKey}, Amount: ${cardAmount}`);
+
+                    // Apply multipliers
+                    amounts.push({
+                        cardKey,
+                        originalAmount: cardAmount,
+                        '2X': cardAmount * 20,
+                        '3X': cardAmount * 30,
+                        '5X': cardAmount * 50,
+                    });
+                }
+            }
+        }
+    }
+
+    console.log(`Total amount for bet: ${totalAmount}`);
+
+    const percAmount = totalAmount * 0.85;
+    console.log(`85% of totalAmount: ${percAmount}`);
+
+    // Filter valid amounts based on the 85% threshold
+    const validAmounts = {};
+    amounts.forEach(item => {
+        if (item['2X'] < percAmount) addValidAmount(validAmounts, item, '2X');
+        if (item['3X'] < percAmount) addValidAmount(validAmounts, item, '3X');
+        if (item['5X'] < percAmount) addValidAmount(validAmounts, item, '5X');
+    });
+
+    console.log(`Valid amounts: ${JSON.stringify(validAmounts)}`);
+    return validAmounts;
+};
+
+
+// Helper function to add valid amounts
+const addValidAmount = (validAmounts, item, multiplier) => {
+    if (!validAmounts[item[multiplier]]) validAmounts[item[multiplier]] = [];
+    validAmounts[item[multiplier]].push({ ...item, multiplier, amount: item[multiplier] });
+};
+
+// Function to flatten valid amounts and select a random one
+const selectRandomAmount = (validAmounts) => {
+    const flatValidAmounts = Object.values(validAmounts).flat();
+    console.log(`Flat valid amounts: ${JSON.stringify(flatValidAmounts)}`);
+
+    if (flatValidAmounts.length > 0) {
+        const randomIndex = Math.floor(Math.random() * flatValidAmounts.length);
+        return flatValidAmounts[randomIndex];
+    }
+    return null;
+};
+
+// Function to save the selected card data
+const saveSelectedCard = async (selectedAmount, gameId) => {
+    const uniqueId = uuidv4(); // Generate a unique ID
+    const selectedCardData = {
+        id: uniqueId,
+        cardId: selectedAmount.cardKey,
+        multiplier: selectedAmount.multiplier,
+        amount: selectedAmount.amount,
+        originalAmount: selectedAmount.originalAmount,
+    };
+
+    const selectedCard = new SelectedCard(selectedCardData);
+    await selectedCard.save();
+    console.log(`Selected card saved for game ${gameId}: ${JSON.stringify(selectedCardData)}`);
 };
