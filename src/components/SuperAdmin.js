@@ -46,7 +46,7 @@ const SuperAdmin = () => {
         });
 
         setTimeout(() => {
-          navigate("/sidebar");
+          navigate("/admindata");
         }, 3000);
       }
     } catch (error) {

@@ -28,7 +28,6 @@ const App = () => {
 
   React.useEffect(() => {
     if (isLoggedIn) {
-      navigate("/dashboard");
     }
   }, [isLoggedIn, navigate]);
 
