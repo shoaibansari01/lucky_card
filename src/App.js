@@ -1,30 +1,60 @@
+import React from "react";
+import { Routes, Route, useNavigate } from "react-router-dom";
+import Sidebar from "./components/Sidebar";
+import SuperAdmin from "./components/SuperAdmin";
+import SignUpPage from "./components/CreateAdmin";
+import AdminData from "./components/AdminData";
+import Successfull from "./components/Successfull";
+import Utility from "./components/Utility";
+import Wallet from "./components/Wallet";
+import DataAdmin from "./components/DataAdmin";
+import GameHistory from "./components/GameHistory";
 
-import './App.css';
-import './index.css';
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import SuperAdmin from './components/SuperAdmin';
-import CreateAdmin from './components/CreateAdmin';
-import Successfull from './components/Successfull';
-
-function App() {
+const AppLayout = ({ children }) => {
   return (
-    <div className="App">
-     <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<SuperAdmin />}></Route>
-          <Route path="/create" element={<CreateAdmin />}></Route>
-          <Route path="/success" element={<Successfull />}></Route>
-
-        </Routes>
-      </BrowserRouter>
+    <div className="flex">
+      <Sidebar />
+      <div className="flex-grow">
+        {children} 
+      </div>
     </div>
-    
   );
-}
+};
+
+const App = () => {
+  const navigate = useNavigate();
+
+  const isLoggedIn = !!localStorage.getItem("token");
+
+  React.useEffect(() => {
+    if (isLoggedIn) {
+      navigate("/dashboard");
+    }
+  }, [isLoggedIn, navigate]);
+
+  return (
+    <Routes>
+      <Route path="/" element={<SuperAdmin />} />
+      <Route
+        path="*"
+        element={
+          <AppLayout>
+            <Routes>
+              <Route path="/dashboard" element={<div>Dashboard</div>} />
+              <Route path="/create" element={<SignUpPage />} />
+              <Route path="/admindata" element={<AdminData />} />
+              <Route path="/success" element={<Successfull />} />
+              <Route path="/utility" element={<Utility />} />
+              <Route path="/wallet" element={<Wallet />} />
+              <Route path="/dataadmin" element={<DataAdmin />} />
+              <Route path="/gamehistory" element={<GameHistory />} />
+
+            </Routes>
+          </AppLayout>
+        }
+      />
+    </Routes>
+  );
+};
 
 export default App;
-
-
-
- 
-    

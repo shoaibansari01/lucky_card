@@ -4,7 +4,7 @@ import { RxEyeOpen } from "react-icons/rx";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css"; 
+import "react-toastify/dist/ReactToastify.css";
 
 const SuperAdmin = () => {
   const [username, setUserName] = useState("");
@@ -15,13 +15,13 @@ const SuperAdmin = () => {
   useEffect(() => {
     const token = localStorage.getItem("authToken");
     if (!token) {
-      navigate("/login");
+      navigate("/");
     }
   }, [navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     try {
       const response = await axios.post(
         "http://localhost:5000/api/super-admin/login",
@@ -30,26 +30,24 @@ const SuperAdmin = () => {
           password,
         }
       );
-  
+
       if (response.status === 200) {
         const token = response.data.token;
         localStorage.setItem("authToken", token);
-  
-        
+
         toast.success("Login successful!", {
           position: "top-center",
-          autoClose: 3000, 
+          autoClose: 3000,
           hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: true,
           draggable: true,
           progress: undefined,
         });
-  
-        
+
         setTimeout(() => {
-          navigate("/create"); 
-        }, 3000); 
+          navigate("/sidebar");
+        }, 3000);
       }
     } catch (error) {
       console.error("Error creating superadmin:", error);
@@ -64,7 +62,6 @@ const SuperAdmin = () => {
       });
     }
   };
-  
 
   const togglePasswordVisibility = () => {
     setPasswordVisible(!passwordVisible);
@@ -117,7 +114,7 @@ const SuperAdmin = () => {
           </button>
         </form>
       </div>
-     
+
       <ToastContainer />
     </div>
   );

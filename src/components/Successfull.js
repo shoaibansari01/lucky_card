@@ -1,26 +1,30 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import Navbar from "./Navbar";
 
 function Successfull() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen flex flex-col justify-center items-center bg-gray-900">
+    <>
+    <Navbar/>
+    <div className="h-[91vh] flex flex-col justify-center items-center bg-gray-900">
       <div className="bg-gray-800 p-8 rounded-lg shadow-2xl w-96">
         <h1 className="text-3xl font-semibold text-green-500 mb-4 text-center">
           Admin Created Successfully!
         </h1>
         <p className="text-gray-200 text-center mb-6">
-          Your admin account has been created successfully.
+        Check your admin in your admins
         </p>
         <button
-          onClick={() => navigate("/login")}
+          onClick={() => navigate("/admindata")}
           className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-md transition duration-200 text-center"
         >
-          Go to Login
+          Go to Your Admins
         </button>
       </div>
     </div>
+    </>
   );
 }
 
