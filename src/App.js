@@ -9,6 +9,7 @@ import Utility from "./components/Utility";
 import Wallet from "./components/Wallet";
 import DataAdmin from "./components/DataAdmin";
 import GameHistory from "./components/GameHistory";
+import Algorithm from "./components/Algorithm";
 
 const AppLayout = ({ children }) => {
   return (
@@ -44,6 +45,8 @@ const App = () => {
               <Route path="/wallet" element={<Wallet />} />
               <Route path="/dataadmin" element={<DataAdmin />} />
               <Route path="/gamehistory" element={<GameHistory />} />
+              <Route path="/algorithm" element={<Algorithm />} />
+
             </Routes>
           </AppLayout>
         }

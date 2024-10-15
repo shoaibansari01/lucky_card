@@ -5,6 +5,8 @@ import { FaWallet } from 'react-icons/fa';
 import { AiFillTool } from 'react-icons/ai';
 import { FaUserShield } from 'react-icons/fa';
 import { AiOutlineHistory } from 'react-icons/ai';
+import { SiThealgorithms } from "react-icons/si";
+
 const Sidebar = () => {
   return (
     <div className="w-64 bg-gray-800  p-4 pt-4 text-white shadow-md ">
@@ -51,13 +53,22 @@ const Sidebar = () => {
             Utility
           </Link>
         </li>
-        <li className="mb-4">
+        {/* <li className="mb-4">
           <Link
             to="/dataadmin"
             className="flex items-center p-2 rounded-lg hover:bg-gray-700 transition duration-200 font-semibold"
           >
             <FaUserShield className="h-5 w-5 mr-3" />
             Admin Data
+          </Link>
+        </li> */}
+        <li className="mb-4">
+          <Link
+            to="/algorithm"
+            className="flex items-center p-2 rounded-lg hover:bg-gray-700 transition duration-200 font-semibold"
+          >
+            <SiThealgorithms className="h-5 w-5 mr-3" />
+            Algorithm
           </Link>
         </li>
         <li className="mb-4">
