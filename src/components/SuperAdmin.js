@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+import Constant from "../utils/Constant";
 const SuperAdmin = () => {
   const [username, setUserName] = useState("");
   const [password, setPassword] = useState("");
@@ -21,16 +21,15 @@ const SuperAdmin = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    console.log({ username, password });
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/super-admin/login",
+        "https://lucky-card-backend.onrender.com/api/super-admin/login",
         {
           username,
           password,
         }
       );
-
       if (response.status === 200) {
         const token = response.data.token;
         localStorage.setItem("authToken", token);
@@ -114,7 +113,6 @@ const SuperAdmin = () => {
           </button>
         </form>
       </div>
-
       <ToastContainer />
     </div>
   );

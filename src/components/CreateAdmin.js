@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { FaEyeSlash } from "react-icons/fa";
 import { RxEyeOpen } from "react-icons/rx";
 import Navbar from "./Navbar";
+import Constant from "../utils/Constant";
 
 function SignUpPage() {
   const [name, setName] = useState("");
@@ -33,7 +34,7 @@ function SignUpPage() {
     try {
       const token = localStorage.getItem("authToken");
 
-      const response = await fetch("http://localhost:5000/api/admin/create", {
+      const response = await fetch(`${Constant.BASE_URL}/admin/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -65,8 +66,7 @@ function SignUpPage() {
     setIsLoading(true);
 
     try {
-      const response = await fetch(
-        "http://localhost:5000/api/admin/verify-otp",
+      const response = await fetch(`${Constant.BASE_URL}/admin/verify-otp`,
         {
           method: "POST",
           headers: {

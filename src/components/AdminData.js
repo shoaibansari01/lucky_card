@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Navbar from "./Navbar";
-
+import Constant from "../utils/Constant";
 function AdminData() {
   const [data, setData] = useState([]);
 
   useEffect(() => {
     const token = localStorage.getItem("authToken");
-
     axios
-      .get("http://localhost:5000/api/admin/all-admins", {
+      .get(`${Constant.BASE_URL}/admin/all-admins`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

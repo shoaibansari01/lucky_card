@@ -14,9 +14,7 @@ const AppLayout = ({ children }) => {
   return (
     <div className="flex">
       <Sidebar />
-      <div className="flex-grow">
-        {children} 
-      </div>
+      <div className="flex-grow">{children}</div>
     </div>
   );
 };
@@ -39,7 +37,6 @@ const App = () => {
         element={
           <AppLayout>
             <Routes>
-              <Route path="/dashboard" element={<div>Dashboard</div>} />
               <Route path="/create" element={<SignUpPage />} />
               <Route path="/admindata" element={<AdminData />} />
               <Route path="/success" element={<Successfull />} />
@@ -47,7 +44,6 @@ const App = () => {
               <Route path="/wallet" element={<Wallet />} />
               <Route path="/dataadmin" element={<DataAdmin />} />
               <Route path="/gamehistory" element={<GameHistory />} />
-
             </Routes>
           </AppLayout>
         }
