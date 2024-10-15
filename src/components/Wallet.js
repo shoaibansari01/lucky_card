@@ -28,7 +28,7 @@
 //   const handleAddMoney = async (e) => {
 //     e.preventDefault();
 //     if (amount && selectedAdmin) {
-//       console.log("Selected Admin ID:", selectedAdmin); 
+//       console.log("Selected Admin ID:", selectedAdmin);
 //       const token = localStorage.getItem("authToken");
 
 //       try {
@@ -43,14 +43,13 @@
 //             },
 //           }
 //         );
-  
-//         console.log(response.data.message); 
+
+//         console.log(response.data.message);
 //       } catch (error) {
-//         console.error("Error adding to wallet:", error.response.data); 
+//         console.error("Error adding to wallet:", error.response.data);
 //       }
 //     }
 //   };
-  
 
 //   return (
 //     <>
@@ -145,72 +144,92 @@
 // };
 
 // export default Wallet;
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
+import Navbar from "./Navbar";
 const AdminWalletUpdate = () => {
   const [admins, setAdmins] = useState([]);
-  const [selectedAdminId, setSelectedAdminId] = useState('');
-  const [amount, setAmount] = useState('');
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
+  const [selectedAdminId, setSelectedAdminId] = useState("");
+  const [amount, setAmount] = useState("");
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
   useEffect(() => {
     fetchAdmins();
   }, []);
+  console.log(selectedAdminId);
+
   const fetchAdmins = async () => {
     try {
-      const token = localStorage.getItem('authToken'); // Retrieve JWT from local storage
-      const response = await fetch("https://lucky-card-backend.onrender.com/api/admin/all-admins", {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`, // Include JWT in the request
-        },
-      });
+      const token = localStorage.getItem("authToken"); // Retrieve JWT from local storage
+      const response = await fetch(
+        "https://lucky-card-backend.onrender.com/api/super-admin/all-admins",
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`, // Include JWT in the request
+          },
+        }
+      );
+
       if (response.ok) {
         const data = await response.json();
         setAdmins(data);
-        console.log(data)
+        console.log(data);
       } else {
-        setError('Failed to fetch admin list');
+        setError("Failed to fetch admin list");
       }
     } catch (error) {
-      setError('Error connecting to the server');
+      setError("Error connecting to the server");
     }
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setMessage('');
-    setError('');
+    setMessage("");
+    setError("");
     if (!selectedAdminId) {
-      setError('Please select an admin');
+      setError("Please select an admin");
       return;
     }
     try {
-      const token = localStorage.getItem('authToken'); // Retrieve JWT from local storage
-      const response = await fetch("https://lucky-card-backend.onrender.com/api/super-admin/add-to-wallet", {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`, // Include JWT in the request
-        },
-        body: JSON.stringify({ adminId: selectedAdminId, amount: Number(amount) }),
-      });
+      const token = localStorage.getItem("authToken"); // Retrieve JWT from local storage
+      const response = await fetch(
+        "https://lucky-card-backend.onrender.com/api/super-admin/add-to-wallet",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // Include JWT in the request
+          },
+          body: JSON.stringify({
+            adminId: selectedAdminId,
+            amount: Number(amount),
+          }),
+        }
+      );
       const data = await response.json();
       if (response.ok) {
         setMessage(`Success! New balance for Admin: ${data.newBalance}`);
-        setSelectedAdminId('');
-        setAmount('');
+        setSelectedAdminId("");
+        setAmount("");
       } else {
-        setError(data.error || 'An error occurred');
+        setError(data.error || "An error occurred");
       }
     } catch (error) {
-      setError('Failed to connect to the server');
+      setError("Failed to connect to the server");
     }
   };
   return (
-    <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-xl">
-      <h2 className="text-2xl font-bold mb-6 text-center">Update Admin Wallet</h2>
+    <>
+    <Navbar/>
+    <div className="max-w-md mx-auto mt-10 p-6 h-[86vh] bg-white rounded-lg shadow-xl">
+      <h2 className="text-2xl font-bold mb-6 text-center">
+        Update Admin Wallet
+      </h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="adminSelect" className="block text-sm font-medium text-gray-700 mb-1">
+          <label
+            htmlFor="adminSelect"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
             Select Admin
           </label>
           <select
@@ -221,14 +240,17 @@ const AdminWalletUpdate = () => {
           >
             <option value="">Select an admin</option>
             {admins.map((admin) => (
-              <option key={admin.email} value={admin.email}>
+              <option key={admin.adminId} value={admin.adminId}>
                 {admin.name} ({admin.email}) - Balance: {admin.walletBalance}
               </option>
             ))}
           </select>
         </div>
         <div>
-          <label htmlFor="amount" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="amount"
+            className="block text-sm font-medium text-gray-700"
+          >
             Amount to Add
           </label>
           <input
@@ -260,6 +282,7 @@ const AdminWalletUpdate = () => {
         </div>
       )}
     </div>
+    </>
   );
 };
 export default AdminWalletUpdate;

@@ -13,12 +13,13 @@ function AdminData() {
   useEffect(() => {
     const token = localStorage.getItem("authToken");
     axios
-      .get(`${Constant.BASE_URL}/admin/all-admins`, {
+      .get(`${Constant.BASE_URL}/super-admin/all-admins`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       })
       .then((response) => {
+        for (let i = 0; i < response.data.length; i++) {}
         setData(response.data);
       })
       .catch((error) => {
@@ -26,20 +27,20 @@ function AdminData() {
       });
   }, []);
 
-  const handleDelete = (email) => {
-    setSelectedEmail(email);
+  const handleDelete = (adminId) => {
+    setSelectedEmail(adminId);
     setActionType("delete");
     setModalOpen(true);
   };
 
-  const handleBlock = (email) => {
-    setSelectedEmail(email);
+  const handleBlock = (adminId) => {
+    setSelectedEmail(adminId);
     setActionType("block");
     setModalOpen(true);
   };
 
-  const handleUnblock = (email) => {
-    setSelectedEmail(email);
+  const handleUnblock = (adminId) => {
+    setSelectedEmail(adminId);
     setActionType("unblock");
     setModalOpen(true);
   };
@@ -57,13 +58,19 @@ function AdminData() {
     }
 
     try {
-      await axios.post(apiUrl, { email: selectedEmail }, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      await axios.post(
+        apiUrl,
+        { adminId: selectedEmail },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       // Refresh data or remove the item from state
-      setData((prevData) => prevData.filter((item) => item.email !== selectedEmail));
+      setData((prevData) =>
+        prevData.filter((item) => item.adminId !== selectedEmail)
+      );
     } catch (error) {
       console.error("Error performing action:", error);
     }
@@ -82,38 +89,54 @@ function AdminData() {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created On</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Wallet Balance</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Name
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Email
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Created On
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Wallet Balance
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {data.map((item) => (
                   <tr key={item.email}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{item.name}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{item.email}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      {item.name}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      {item.email}
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       {new Date(item.creationDate).toLocaleDateString()}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">₹{item.walletBalance}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      ₹{item.walletBalance}
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       <button
                         className="mr-2 text-white bg-red-500 hover:bg-red-600 font-semibold py-1 px-2 rounded"
-                        onClick={() => handleDelete(item.email)}
+                        onClick={() => handleDelete(item.adminId)}
                       >
                         Delete
                       </button>
                       <button
                         className="mr-2 text-white bg-yellow-500 hover:bg-yellow-600 font-semibold py-1 px-2 rounded"
-                        onClick={() => handleBlock(item.email)}
+                        onClick={() => handleBlock(item.adminId)}
                       >
                         Block
                       </button>
                       <button
                         className="text-white bg-green-500 hover:bg-green-600 font-semibold py-1 px-2 rounded"
-                        onClick={() => handleUnblock(item.email)}
+                        onClick={() => handleUnblock(item.adminId)}
                       >
                         Unblock
                       </button>
