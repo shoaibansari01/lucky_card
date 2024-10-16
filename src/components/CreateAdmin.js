@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaEyeSlash } from "react-icons/fa";
 import { RxEyeOpen } from "react-icons/rx";
@@ -20,6 +20,25 @@ function SignUpPage() {
   const togglePasswordVisibility = () => {
     setPasswordVisible(!passwordVisible);
   };
+
+  useEffect(() => {
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      window.location.replace("http://localhost:3000"); // Redirect to login page if token is missing
+    }
+  }, []);
+  
+  // Function to check if authToken is present
+  const checkAuthToken = () => {
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      window.location.replace("http://localhost:3000"); // Hard redirect to login page
+    }
+  };
+
+  useEffect(() => {
+    checkAuthToken(); // Check token on component mount
+  }, []);
 
   const handleSendOTP = async (e) => {
     e.preventDefault();
@@ -66,20 +85,18 @@ function SignUpPage() {
     setIsLoading(true);
 
     try {
-      const response = await fetch(`${Constant.BASE_URL}/admin/verify-otp`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            name,
-            email,
-            otp,
-            password,
-          }),
-        }
-      );
+      const response = await fetch(`${Constant.BASE_URL}/admin/verify-otp`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          otp,
+          password,
+        }),
+      });
 
       const data = await response.json();
       setMessage(data.message);
@@ -100,11 +117,10 @@ function SignUpPage() {
   return (
     <>
       <Navbar />
-
       <div className="h-[91vh] flex flex-col p-">
         <div className="flex flex-grow items-center justify-center bg-gray-200 ">
           <div className="bg-white p-8 rounded-lg shadow-xl w-96">
-            <h1 className="text-2xl font-bold text-black mb-6 text-center">
+            <h1 className="text-2xl font-semibold text-yellow-500 mb-6 text-center">
               Create Admin
             </h1>
             {message && (
@@ -122,7 +138,7 @@ function SignUpPage() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Full Name"
-                  className="mt-1 block w-full p-2 bg-white text-black border border-gray-600 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-400"
+                  className="mt-1 block w-full p-2 bg-white text-black border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
                   disabled={otpSent || isLoading}
                   required
                 />
@@ -133,7 +149,7 @@ function SignUpPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Email"
-                  className="mt-1 block w-full p-2 bg-white text-black border border-gray-600 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-400"
+                  className="mt-1 block w-full p-2 bg-white text-black border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
                   disabled={otpSent || isLoading}
                   required
                 />
@@ -145,7 +161,7 @@ function SignUpPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Password"
-                  className="mt-1 block w-full p-2 bg-white text-black border border-gray-600 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-400"
+                  className="mt-1 block w-full p-2 bg-white text-black border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
                   disabled={otpSent || isLoading}
                   required
                 />
@@ -166,7 +182,7 @@ function SignUpPage() {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Confirm Password"
-                  className="mt-1 block w-full p-2 bg-white text-black border border-gray-600 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-400"
+                  className="mt-1 block w-full p-2 bg-white text-black border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
                   disabled={otpSent || isLoading}
                   required
                 />

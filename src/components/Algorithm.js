@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import Navbar from './Navbar';
+import React, { useState } from "react";
+import axios from "axios";
+import Navbar from "./Navbar";
 
 export default function Algorithm() {
-  const [selectedOption, setSelectedOption] = useState('');
+  const [selectedOption, setSelectedOption] = useState("");
 
   const handleSelectChange = (event) => {
     const value = event.target.value;
@@ -11,14 +11,17 @@ export default function Algorithm() {
 
     if (value) {
       axios
-        .post("https://lucky-card-backend.onrender.com/api/super-admin/choose-algorithm", {
-          algorithm: value,
-        })
+        .post(
+          "https://lucky-card-backend.onrender.com/api/super-admin/choose-algorithm",
+          {
+            algorithm: value,
+          }
+        )
         .then((response) => {
-          console.log('Data posted successfully:', response.data);
+          console.log("Data posted successfully:", response.data);
         })
         .catch((error) => {
-          console.error('Error posting data:', error);
+          console.error("Error posting data:", error);
         });
     }
   };
@@ -28,9 +31,14 @@ export default function Algorithm() {
       <Navbar />
       <div className="h-[91vh] flex items-center justify-center bg-gray-200 p-6">
         <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full ">
-          <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">Select Algorithm Option</h2>
+          <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">
+            Select Algorithm Option
+          </h2>
           <div className="mb-4">
-            <label htmlFor="algorithmOptions" className="block text-lg font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="algorithmOptions"
+              className="block text-lg font-medium text-gray-700 mb-2"
+            >
               Choose an option:
             </label>
             <select

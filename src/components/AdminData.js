@@ -9,17 +9,31 @@ function AdminData() {
   const [isModalOpen, setModalOpen] = useState(false);
   const [actionType, setActionType] = useState("");
   const [selectedEmail, setSelectedEmail] = useState("");
+  const [selectedAdmin, setSelectedAdmin] = useState(null);
+
+  // Function to check auth token and redirect if not present
+  const checkAuthToken = () => {
+    const token = localStorage.getItem("authToken");
+
+    // If token is missing, redirect to the root (localhost:3000)
+    if (!token) {
+      window.location.replace("http://localhost:3000"); // Hard redirect
+      return false;
+    }
+    return true;
+  };
 
   useEffect(() => {
-    const token = localStorage.getItem("authToken");
+    if (!checkAuthToken()) return; // Check authToken on component mount
+
+    // Fetch data if token is valid
     axios
       .get(`${Constant.BASE_URL}/super-admin/all-admins`, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
         },
       })
       .then((response) => {
-        for (let i = 0; i < response.data.length; i++) {}
         setData(response.data);
       })
       .catch((error) => {
@@ -28,25 +42,30 @@ function AdminData() {
   }, []);
 
   const handleDelete = (adminId) => {
+    if (!checkAuthToken()) return; // Ensure user is authenticated before proceeding
+
     setSelectedEmail(adminId);
     setActionType("delete");
     setModalOpen(true);
   };
 
-  const handleBlock = (adminId) => {
-    setSelectedEmail(adminId);
-    setActionType("block");
-    setModalOpen(true);
-  };
+  const toggleBlockUnblock = (admin) => {
+    if (!checkAuthToken()) return; // Ensure user is authenticated before proceeding
 
-  const handleUnblock = (adminId) => {
-    setSelectedEmail(adminId);
-    setActionType("unblock");
+    setSelectedAdmin(admin);
+    setSelectedEmail(admin.adminId);
+    setActionType(admin.isBlocked ? "unblock" : "block");
     setModalOpen(true);
   };
 
   const confirmAction = async () => {
     const token = localStorage.getItem("authToken");
+
+    if (!token) {
+      window.location.replace("http://localhost:3000"); // Redirect if token is missing
+      return;
+    }
+
     let apiUrl = "";
 
     if (actionType === "delete") {
@@ -67,10 +86,21 @@ function AdminData() {
           },
         }
       );
-      // Refresh data or remove the item from state
-      setData((prevData) =>
-        prevData.filter((item) => item.adminId !== selectedEmail)
-      );
+
+      // Update state after action (delete or block/unblock)
+      if (actionType === "delete") {
+        setData((prevData) =>
+          prevData.filter((item) => item.adminId !== selectedEmail)
+        );
+      } else {
+        setData((prevData) =>
+          prevData.map((item) =>
+            item.adminId === selectedEmail
+              ? { ...item, isBlocked: actionType === "block" }
+              : item
+          )
+        );
+      }
     } catch (error) {
       console.error("Error performing action:", error);
     }
@@ -129,16 +159,14 @@ function AdminData() {
                         Delete
                       </button>
                       <button
-                        className="mr-2 text-white bg-yellow-500 hover:bg-yellow-600 font-semibold py-1 px-2 rounded"
-                        onClick={() => handleBlock(item.adminId)}
+                        className={`mr-2 text-white font-semibold py-1 px-2 rounded ${
+                          item.isBlocked
+                            ? "bg-green-500 hover:bg-green-600"
+                            : "bg-yellow-500 hover:bg-yellow-600"
+                        }`}
+                        onClick={() => toggleBlockUnblock(item)}
                       >
-                        Block
-                      </button>
-                      <button
-                        className="text-white bg-green-500 hover:bg-green-600 font-semibold py-1 px-2 rounded"
-                        onClick={() => handleUnblock(item.adminId)}
-                      >
-                        Unblock
+                        {item.isBlocked ? "Unblock" : "Block"}
                       </button>
                     </td>
                   </tr>

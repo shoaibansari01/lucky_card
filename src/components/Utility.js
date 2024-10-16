@@ -1,10 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Navbar from './Navbar';
 
 export default function Utility() {
   const [minutes, setMinutes] = useState(5);
   const [seconds, setSeconds] = useState(0);
   const [algorithmPercentage, setAlgorithmPercentage] = useState(85); // Make this editable
+
+  // Check for authToken on component mount
+  useEffect(() => {
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      window.location.replace("http://localhost:3000"); // Redirect to login page if token is missing
+    }
+  }, []);
 
   const handleMinutesChange = (e) => {
     setMinutes(e.target.value);
@@ -31,7 +39,7 @@ export default function Utility() {
         <div className="bg-white rounded-lg shadow-md p-6 w-80 text-center">
           <h1 className="text-2xl font-bold text-gray-800 mb-4">Utility Dashboard</h1>
 
-          <div className="mb-6">
+          {/* <div className="mb-6">
             <h2 className="text-lg font-semibold text-gray-700">Set Timer for Admin Change</h2>
             <div className="flex justify-center items-center space-x-2">
               <input
@@ -56,7 +64,7 @@ export default function Utility() {
                 Start Timer
               </button>
             </div>
-          </div>
+          </div> */}
 
           <div className="mb-6">
             <h2 className="text-lg font-semibold text-gray-700">Algorithm Efficiency</h2>

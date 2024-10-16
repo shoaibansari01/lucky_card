@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Navbar from "./Navbar";
+import { useNavigate } from 'react-router-dom';
 
 // Mapping of card numbers to icons or names
 const cardNumbers = {
@@ -22,13 +23,20 @@ const GameHistory = () => {
   const [gameHistoryData, setGameHistoryData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate(); // React Router's navigate hook
 
   // Function to fetch game history data from the backend
   const fetchGameHistory = async () => {
     try {
       const token = localStorage.getItem("authToken");
+      if (!token) {
+        // If token is not found, redirect to login
+        navigate('/');
+        return;
+      }
+
       const response = await axios.get(
-        "https://lucky-card-backend.onrender.com/api/super-admin/game-history",
+        "https://lucky-card-backend.onrender.com/api/super-admin/game-history", 
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -50,9 +58,17 @@ const GameHistory = () => {
     }
   };
 
+  // useEffect to check token and fetch game history
   useEffect(() => {
-    fetchGameHistory();
-  }, []);
+    const token = localStorage.getItem("authToken");
+    
+    if (!token) {
+      // If token is missing, redirect to login page
+      navigate('/');
+    } else {
+      fetchGameHistory();
+    }
+  }, [navigate]); // Add navigate as a dependency to prevent issues with hooks
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>{error}</p>;
@@ -61,10 +77,11 @@ const GameHistory = () => {
     <>
       <Navbar />
 
-      <div className=" h-[91vh] mx p-6 bg-white rounded-lg shadow-lg bg-gray-200">
+      <div className="max-w-8xl h-[91vh] mx-auto p-6  rounded-lg shadow-lg bg-gray-200">
         <h1 className="text-3xl font-bold mb-6 text-gray-800">Game History</h1>
 
-        <div className="overflow-hidden border-b border-gray-200 shadow-md rounded-lg">
+        {/* Add the hide-scrollbar class here */}
+        <div className="border-b border-gray-200 shadow-md rounded-lg overflow-auto w-[1400px] hide-scrollbar">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
@@ -82,9 +99,9 @@ const GameHistory = () => {
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Winning Amount
-                </th>
+                </th>   
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Cards 
+                  Cards
                 </th>
               </tr>
             </thead>

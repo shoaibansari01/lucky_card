@@ -1,4 +1,5 @@
 import React from "react";
+import "./App.css"
 import { Routes, Route, useNavigate } from "react-router-dom";
 import Sidebar from "./components/Sidebar";
 import SuperAdmin from "./components/SuperAdmin";
