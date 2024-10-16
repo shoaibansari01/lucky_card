@@ -9,7 +9,7 @@ import { SiThealgorithms } from "react-icons/si";
 
 const Sidebar = () => {
   return (
-    <div className="w-64 bg-gray-800  p-4 pt-4 text-white shadow-md  ">
+    <div className="w-64 bg-gray-800  p-4 pt-4 text-white shadow-md">
       <div className="mb-6">
         <h1 className="text-2xl font-extrabold text-center mb-2">
           Super Admin{" "}
