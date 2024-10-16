@@ -5,11 +5,11 @@ import { FaWallet } from 'react-icons/fa';
 import { AiFillTool } from 'react-icons/ai';
 import { FaUserShield } from 'react-icons/fa';
 import { AiOutlineHistory } from 'react-icons/ai';
-import { SiAlgorand } from "react-icons/si";
+import { SiThealgorithms } from "react-icons/si";
 
 const Sidebar = () => {
   return (
-    <div className="w-64 bg-gray-800  p-4 pt-4 text-white shadow-md ">
+    <div className="w-64 bg-gray-800  p-4 pt-4 text-white shadow-md  ">
       <div className="mb-6">
         <h1 className="text-2xl font-extrabold text-center mb-2">
           Super Admin{" "}
@@ -53,18 +53,24 @@ const Sidebar = () => {
             Utility
           </Link>
         </li>
-
-        <li className="mb-4"> 
+        {/* <li className="mb-4">
           <Link
-            to="/gamehistory"
+            to="/dataadmin"
             className="flex items-center p-2 rounded-lg hover:bg-gray-700 transition duration-200 font-semibold"
           >
-            <SiAlgorand
-            className="h-5 w-5 mr-3" />
-           Algorithm
+            <FaUserShield className="h-5 w-5 mr-3" />
+            Admin Data
+          </Link>
+        </li> */}
+        <li className="mb-4">
+          <Link
+            to="/algorithm"
+            className="flex items-center p-2 rounded-lg hover:bg-gray-700 transition duration-200 font-semibold"
+          >
+            <SiThealgorithms className="h-5 w-5 mr-3" />
+            Algorithm
           </Link>
         </li>
-
         <li className="mb-4">
           <Link
             to="/gamehistory"
@@ -74,10 +80,17 @@ const Sidebar = () => {
             Game Id History
           </Link>
         </li>
-
       </ul>
     </div>
   );
 };
 
 export default Sidebar;
+
+
+
+
+
+
+
+

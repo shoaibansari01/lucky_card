@@ -25,13 +25,11 @@ const SuperAdmin = () => {
     try {
       const response = await axios.post(
         "https://lucky-card-backend.onrender.com/api/super-admin/login",
-        
         {
           username,
           password,
         }
       );
-      
       if (response.status === 200) {
         const token = response.data.token;
         localStorage.setItem("authToken", token);
@@ -62,7 +60,7 @@ const SuperAdmin = () => {
         progress: undefined,
       });
     }
-  };                                          
+  };
 
   const togglePasswordVisibility = () => {
     setPasswordVisible(!passwordVisible);

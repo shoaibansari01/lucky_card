@@ -9,7 +9,8 @@ import Utility from "./components/Utility";
 import Wallet from "./components/Wallet";
 import DataAdmin from "./components/DataAdmin";
 import GameHistory from "./components/GameHistory";
-
+import Algorithm from "./components/Algorithm";
+import "./App.css"  
 const AppLayout = ({ children }) => {
   return (
     <div className="flex">
@@ -42,8 +43,10 @@ const App = () => {
               <Route path="/success" element={<Successfull />} />
               <Route path="/utility" element={<Utility />} />
               <Route path="/wallet" element={<Wallet />} />
-              {/* <Route path="/dataadmin" element={<DataAdmin />} /> */}
+              <Route path="/dataadmin" element={<DataAdmin />} />
               <Route path="/gamehistory" element={<GameHistory />} />
+              <Route path="/algorithm" element={<Algorithm />} />
+
             </Routes>
           </AppLayout>
         }

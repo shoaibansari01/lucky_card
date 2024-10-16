@@ -8,12 +8,12 @@ function Successfull() {
   return (
     <>
     <Navbar/>
-    <div className="h-[91vh] flex flex-col justify-center items-center bg-gray-900">
-      <div className="bg-gray-800 p-8 rounded-lg shadow-2xl w-96">
+    <div className="h-[91vh] flex flex-col justify-center items-center bg-gray-200">
+      <div className="bg-white p-8 rounded-lg shadow-xl w-96">
         <h1 className="text-3xl font-semibold text-green-500 mb-4 text-center">
           Admin Created Successfully!
         </h1>
-        <p className="text-gray-200 text-center mb-6">
+        <p className="text-black text-center mb-6">
         Check your admin in your admins
         </p>
         <button

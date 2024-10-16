@@ -4,7 +4,7 @@ import Navbar from './Navbar';
 const DataAdmin = () => {
   const gameData = [
     { id: 1, gameName: 'Game 1', ticketsSold: 150, winnings: '₹5000' },
-    { id: 2, gameName: 'Game 2', ticketsSold: 250, winnings: '₹12000' }, 
+    { id: 2, gameName: 'Game 2', ticketsSold: 250, winnings: '₹12000' },
     { id: 3, gameName: 'Game 3', ticketsSold: 100, winnings: '₹3000' },
   ];
 
@@ -87,7 +87,7 @@ const DataAdmin = () => {
       </div>
     </div>
     </>
-  );        
+  );
 };
 
 export default DataAdmin;

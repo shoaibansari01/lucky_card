@@ -27,7 +27,7 @@ export default function Utility() {
   return (
     <>
       <Navbar />
-      <div className="p-6 bg-gray-100 h-screen flex flex-col items-center justify-center">
+      <div className="p-6 bg-gray-100 h-[91vh] flex flex-col items-center justify-center">
         <div className="bg-white rounded-lg shadow-md p-6 w-80 text-center">
           <h1 className="text-2xl font-bold text-gray-800 mb-4">Utility Dashboard</h1>
 
