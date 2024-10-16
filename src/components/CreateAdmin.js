@@ -104,7 +104,7 @@ function SignUpPage() {
       <div className="h-[91vh] flex flex-col p-">
         <div className="flex flex-grow items-center justify-center bg-gray-200 ">
           <div className="bg-white p-8 rounded-lg shadow-xl w-96">
-            <h1 className="text-2xl font-semibold text-yellow-500 mb-6 text-center">
+            <h1 className="text-2xl font-bold text-black mb-6 text-center">
               Create Admin
             </h1>
             {message && (
@@ -122,7 +122,7 @@ function SignUpPage() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Full Name"
-                  className="mt-1 block w-full p-2 bg-white text-black border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                  className="mt-1 block w-full p-2 bg-white text-black border border-gray-600 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-400"
                   disabled={otpSent || isLoading}
                   required
                 />
@@ -133,7 +133,7 @@ function SignUpPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Email"
-                  className="mt-1 block w-full p-2 bg-white text-black border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                  className="mt-1 block w-full p-2 bg-white text-black border border-gray-600 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-400"
                   disabled={otpSent || isLoading}
                   required
                 />
@@ -145,7 +145,7 @@ function SignUpPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Password"
-                  className="mt-1 block w-full p-2 bg-white text-black border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                  className="mt-1 block w-full p-2 bg-white text-black border border-gray-600 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-400"
                   disabled={otpSent || isLoading}
                   required
                 />
@@ -166,7 +166,7 @@ function SignUpPage() {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Confirm Password"
-                  className="mt-1 block w-full p-2 bg-white text-black border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                  className="mt-1 block w-full p-2 bg-white text-black border border-gray-600 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-400"
                   disabled={otpSent || isLoading}
                   required
                 />

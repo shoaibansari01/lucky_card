@@ -61,7 +61,7 @@ const GameHistory = () => {
     <>
       <Navbar />
 
-      <div className="max-w-8xl h-[91vh] mx-auto p-6 bg-white rounded-lg shadow-lg bg-gray-200">
+      <div className=" h-[91vh] mx p-6 bg-white rounded-lg shadow-lg bg-gray-200">
         <h1 className="text-3xl font-bold mb-6 text-gray-800">Game History</h1>
 
         <div className="overflow-hidden border-b border-gray-200 shadow-md rounded-lg">
