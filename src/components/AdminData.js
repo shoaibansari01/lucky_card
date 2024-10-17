@@ -3,23 +3,27 @@ import axios from "axios";
 import Navbar from "./Navbar";
 import Constant from "../utils/Constant";
 import Modal from "./Modal"; // Import the modal component
+
 function AdminData() {
   const [data, setData] = useState([]);
-const [isPopupOpen, setPopupOpen] = useState(false);
+  const [isPopupOpen, setPopupOpen] = useState(false);
   const [isModalOpen, setModalOpen] = useState(false);
   const [actionType, setActionType] = useState("");
   const [selectedEmail, setSelectedEmail] = useState("");
   const [selectedAdmin, setSelectedAdmin] = useState(null);
+  const [gameDetails, setGameDetails] = useState([]); // State to hold game details
+  const [adminId, setAdminId] = useState("");
+
   // Function to check auth token and redirect if not present
   const checkAuthToken = () => {
     const token = localStorage.getItem("authToken");
-    // If token is missing, redirect to the root (localhost:3000)
     if (!token) {
       window.location.replace("http://localhost:3000"); // Hard redirect
       return false;
     }
     return true;
   };
+
   useEffect(() => {
     if (!checkAuthToken()) return; // Check authToken on component mount
     // Fetch data if token is valid
@@ -36,22 +40,43 @@ const [isPopupOpen, setPopupOpen] = useState(false);
         console.error("Error fetching:", error);
       });
   }, []);
-  //  Function to handle opening of the static popup
-  const handleCheckDetails = (admin) => {
-    setSelectedAdmin(admin); // Set the selected admin to display their details
-    setPopupOpen(true); // Open the popup
+
+  // Function to handle opening of the static popup
+  const handleCheckDetails = async (admin) => {
+    setSelectedAdmin(admin);
+    setPopupOpen(true);
+
+    try {
+      const response = await axios.get(
+        `http://localhost:5000/api/super-admin/winnings/${admin.adminId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
+        }
+      );
+
+      console.log("API response for winnings:", response.data);
+      setGameDetails(response.data.data);
+    } catch (error) {
+      console.error("Error fetching game details:", error);
+    }
   };
+
   // Function to close the popup
   const closePopup = () => {
     setPopupOpen(false); // Close the popup
     setSelectedAdmin(null); // Clear selected admin details
+    setGameDetails([]); // Clear game details when closing
   };
+
   const handleDelete = (adminId) => {
     if (!checkAuthToken()) return; // Ensure user is authenticated before proceeding
     setSelectedEmail(adminId);
     setActionType("delete");
     setModalOpen(true);
   };
+
   const toggleBlockUnblock = (admin) => {
     if (!checkAuthToken()) return; // Ensure user is authenticated before proceeding
     setSelectedAdmin(admin);
@@ -59,6 +84,7 @@ const [isPopupOpen, setPopupOpen] = useState(false);
     setActionType(admin.isBlocked ? "unblock" : "block");
     setModalOpen(true);
   };
+
   const confirmAction = async () => {
     const token = localStorage.getItem("authToken");
     if (!token) {
@@ -103,6 +129,7 @@ const [isPopupOpen, setPopupOpen] = useState(false);
     setModalOpen(false);
     setSelectedEmail("");
   };
+
   return (
     <>
       <Navbar />
@@ -149,7 +176,7 @@ const [isPopupOpen, setPopupOpen] = useState(false);
                       ₹{item.walletBalance}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    <button
+                      <button
                         className="mr-2 text-white bg-green-600 hover:bg-green-700 font-semibold py-1 px-2 rounded"
                         onClick={() => handleCheckDetails(item)}
                       >
@@ -183,38 +210,68 @@ const [isPopupOpen, setPopupOpen] = useState(false);
           <div className="mt-4 text-gray-500">No admin data available.</div>
         )}
       </div>
-        {/* Static Popup */}
+
+      {/* Static Popup */}
       {isPopupOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
-          <div className="bg-white p-6 rounded-lg w-[700px]">
+        <div
+          className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50"
+          onClick={closePopup}
+        >
+          <div className="bg-white p-6 rounded-lg w-[1100px] h-[500px] overflow-x-auto overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             <h2 className="text-xl font-semibold mb-4">Admin Game Details</h2>
-            <table className="min-w-full text-left border border-gray-300">
-              <thead>
-                <tr>
-                  <th className="border px-4 py-2 text-xs font-semibold text-gray-600">Game ID</th>
-                  <th className="border px-2 py-1 text-xs font-semibold text-gray-600">Bets</th>
-                  <th className="border px-2 py-1 text-xs font-semibold text-gray-600">Lose</th>
-                  <th className="border px-2 py-1 text-xs font-semibold text-gray-600">Win</th>
-                  <th className="border px-7 py-1 text-xs font-semibold text-gray-600">Time</th>
-                  <th className="border px-7 py-1 text-xs font-semibold text-gray-600">Date</th>
-                </tr>
-              </thead>
-              <tbody>
-           
-                <tr>
-                  <td className="border px-2 py-1">G001</td>
-                  <td className="border px-2 py-1">₹500</td>
-                  <td className="border px-2 py-1">₹100</td>
-                  <td className="border px-2 py-1">₹400</td>
-                  <td className="border px-2 py-1">10:00 AM</td>
-                  <td className="border px-2 py-1">2024-10-17</td>
-                </tr>
-          
-               
-              </tbody>
-            </table>
+            <div className="w-full h-full overflow-x-auto overflow-y-auto scrollbar-hide">
+              <table className="min-w-full text-left border border-gray-300">
+                <thead>
+                  <tr>
+                    <th className="border px-4 py-2 text-xs font-semibold text-gray-600">
+                      Game ID
+                    </th>
+                    <th className="border px-4 py-2 text-xs font-semibold text-gray-600">
+                      Admin ID
+                    </th>
+                    <th className="border px-4 py-2 text-xs font-semibold text-gray-600">
+                      Winning Amount
+                    </th>
+                    <th className="border px-4 py-2 text-xs font-semibold text-gray-600">
+                      Created At
+                    </th>
+                    <th className="border px-4 py-2 text-xs font-semibold text-gray-600">
+                      Updated At
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {gameDetails.length > 0 ? (
+                    gameDetails.map((game) => (
+                      <tr key={game._id}>
+                        <td className="border px-4 py-2">{game.gameId}</td>
+                        <td className="border px-4 py-2">{game.adminId}</td>
+                        <td className="border px-4 py-2">
+                          ₹{game.winningAmount}
+                        </td>
+                        <td className="border px-4 py-2">
+                          {new Date(game.createdAt).toLocaleString()}
+                        </td>
+                        <td className="border px-4 py-2">
+                          {new Date(game.updatedAt).toLocaleString()}
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td
+                        colSpan="5"
+                        className="border px-4 py-2 text-center text-gray-500"
+                      >
+                        No game details available.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
             <button
-              className="mt-4 bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded"
+              className="mt-4 text-white bg-red-500 hover:bg-red-600 font-semibold py-2 px-4 rounded"
               onClick={closePopup}
             >
               Close
@@ -222,13 +279,19 @@ const [isPopupOpen, setPopupOpen] = useState(false);
           </div>
         </div>
       )}
-      <Modal
-        isOpen={isModalOpen}
-        onClose={() => setModalOpen(false)}
-        onConfirm={confirmAction}
-        actionType={actionType}
-      />
+
+      {/* Modal for Delete/Block/Unblock Confirmation */}
+      {isModalOpen && (
+        <Modal
+          isOpen={isModalOpen}
+          onClose={() => setModalOpen(false)}
+          onConfirm={confirmAction}
+          actionType={actionType}
+          email={selectedEmail}
+        />
+      )}
     </>
   );
 }
+
 export default AdminData;

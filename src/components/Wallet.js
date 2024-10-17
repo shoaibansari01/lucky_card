@@ -3,10 +3,12 @@ import Navbar from "./Navbar";
 
 const AdminWalletUpdate = () => {
   const [admins, setAdmins] = useState([]);
-  const [adminId, setAdminId] = useState("");
+  const [depositAdminId, setDepositAdminId] = useState("");
+  const [withdrawAdminId, setWithdrawAdminId] = useState("");
   const [depositAmount, setDepositAmount] = useState("");
   const [withdrawAmount, setWithdrawAmount] = useState("");
-  const [message, setMessage] = useState("");
+  const [depositMessage, setDepositMessage] = useState("");
+  const [withdrawMessage, setWithdrawMessage] = useState("");
   const [error, setError] = useState("");
   const [walletHistory, setWalletHistory] = useState([]);
 
@@ -15,10 +17,10 @@ const AdminWalletUpdate = () => {
   }, []);
 
   useEffect(() => {
-    if (adminId) {
+    if (depositAdminId || withdrawAdminId) {
       getWalletHistory();
     }
-  }, [adminId]);
+  }, [depositAdminId, withdrawAdminId]);
 
   const fetchAdmins = async () => {
     try {
@@ -43,12 +45,15 @@ const AdminWalletUpdate = () => {
       setError("Error connecting to the server");
     }
   };
- 
+
   const getWalletHistory = async () => {
+    const adminId = depositAdminId || withdrawAdminId; // Depending on which one is selected
+    if (!adminId) return;
+
     try {
       const token = localStorage.getItem("authToken");
       const response = await fetch(
-       `http://localhost:5000/api/super-admin/wallet-history/${adminId}`,
+        `https://lucky-card-backend.onrender.com/api/super-admin/wallet-history/${adminId}`,
         {
           method: "GET",
           headers: {
@@ -56,11 +61,10 @@ const AdminWalletUpdate = () => {
           },
         }
       );
-  
+
       if (response.ok) {
         const data = await response.json();
-        console.log("Wallet History Data: ", data); // Add this line to debug
-        setWalletHistory(data.data.transactions);
+        setWalletHistory(data.data.transactions || []); // Ensure it defaults to an empty array
       } else {
         setError("Failed to fetch wallet history");
       }
@@ -68,18 +72,17 @@ const AdminWalletUpdate = () => {
       setError("Error fetching wallet history");
     }
   };
-  
 
   const handleDeposit = async (e) => {
     e.preventDefault();
-    setMessage("");
+    setDepositMessage("");
     setError("");
-  
-    if (!adminId) {
+
+    if (!depositAdminId) {
       setError("Please select an admin");
       return;
     }
-  
+
     try {
       const token = localStorage.getItem("authToken");
       const response = await fetch(
@@ -91,77 +94,126 @@ const AdminWalletUpdate = () => {
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
-            adminId, // using shorthand for adminId
+            adminId: depositAdminId,
             amount: Number(depositAmount),
           }),
         }
       );
-  
+
       const data = await response.json();
-      
+
       if (response.ok) {
-        setMessage(`Deposit successful! New balance: ${data.newBalance}`);
+        setDepositMessage(
+          `Deposit successful! New balance: ${data.newBalance}`
+        );
         setDepositAmount("");
-  
-        // Update the admin's balance in the admins state
-        setAdmins(prevAdmins =>
-          prevAdmins.map(admin =>
-            admin.adminId === adminId
+        setDepositAdminId(""); // Resetting the selected admin ID after deposit
+
+        setAdmins((prevAdmins) =>
+          prevAdmins.map((admin) =>
+            admin.adminId === depositAdminId
               ? { ...admin, walletBalance: data.newBalance }
               : admin
           )
         );
-  
-        // Fetch updated wallet history after a delay
-        setTimeout(() => {
-          getWalletHistory(); // Fetch updated history after a delay
-        }, 1000); // 1 second delay
+
+        // Fetch wallet history after a deposit
+        await getWalletHistory();
       } else {
         setError(data.error || "An error occurred");
       }
-      
     } catch (error) {
       setError("Failed to connect to the server");
     }
   };
-  
 
-  // Implement handleWithdraw similarly to handleDeposit
+  const handleWithdraw = async (e) => {
+    e.preventDefault();
+    setWithdrawMessage("");
+    setError("");
+
+    if (!withdrawAdminId) {
+      setError("Please select an admin");
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("authToken");
+      const response = await fetch(
+        "http://localhost:5000/api/super-admin/set-withdrawal",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            adminId: withdrawAdminId,
+            amount: Number(withdrawAmount),
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setWithdrawMessage(
+          `Withdrawal successful! New balance: ${data.newBalance}`
+        );
+        setWithdrawAmount("");
+        setWithdrawAdminId(""); // Resetting the selected admin ID after withdrawal
+
+        setAdmins((prevAdmins) =>
+          prevAdmins.map((admin) =>
+            admin.adminId === withdrawAdminId
+              ? { ...admin, walletBalance: data.newBalance }
+              : admin
+          )
+        );
+
+        // Fetch wallet history after a withdrawal
+        await getWalletHistory();
+      } else {
+        setError(data.error || "An error occurred");
+      }
+    } catch (error) {
+      setError("Failed to connect to the server");
+    }
+  };
 
   return (
     <>
       <Navbar />
-      <div className="bg-gray-200 h-[91vh] flex flex-col items-center space-y-6 ">
-        <div className="w-[500px] mb-4 mt-8 p-6 bg-white rounded-lg shadow-xl">
-          <h2 className="text-2xl font-bold mb-6 text-center">
-            Update Admin Wallet
-          </h2>
-          <div className="space-y-4">
-            <div>
-              <label
-                htmlFor="adminSelect"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Select Admin
-              </label>
-              <select
-                id="adminSelect"
-                value={adminId}
-                onChange={(e) => setAdminId(e.target.value)}
-                className="mt-1 block w-full p-2 bg-white text-black border border-gray-600 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-400"
-              >
-                <option value="">Select an admin</option>
-                {admins.map((admin) => (
-                  <option key={admin.adminId} value={admin.adminId}>
-                    {admin.name} ({admin.email}) - Balance:{" "}
-                    {admin.walletBalance}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Deposit Box */}
+      <div className="bg-gray-200 h-[91vh] flex flex-col items-center space-y-6">
+        <div className="flex flex-row items-center gap-8">
+          {/* Deposit Box */}
+          <div className="w-[500px] mb-4 mt-8 p-6 bg-white rounded-lg shadow-xl">
+            <h2 className="text-2xl font-bold mb-6 text-center">
+              Admin Deposit Wallet
+            </h2>
             <form onSubmit={handleDeposit} className="space-y-4">
+              <div>
+                <label
+                  htmlFor="adminSelect"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Select Admin
+                </label>
+                <select
+                  id="adminSelect"
+                  value={depositAdminId}
+                  onChange={(e) => setDepositAdminId(e.target.value)}
+                  className="mt-1 block w-full p-2 bg-white text-black border border-gray-600 rounded-md"
+                >
+                  <option value="">Select an admin</option>
+                  {admins.map((admin) => (
+                    <option key={admin.adminId} value={admin.adminId}>
+                      {admin.name} ({admin.email}) - Balance:{" "}
+                      {admin.walletBalance}
+                    </option>
+                  ))}
+                </select>
+              </div>
               <div>
                 <label
                   htmlFor="depositAmount"
@@ -175,9 +227,7 @@ const AdminWalletUpdate = () => {
                   value={depositAmount}
                   onChange={(e) => setDepositAmount(e.target.value)}
                   required
-                  min="0"
-                  step="0.01"
-                  className="mt-1 block w-full p-2 bg-white text-black border border-gray-600 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-400"
+                  className="mt-1 block w-full p-2 bg-white text-black border border-gray-600 rounded-md"
                 />
               </div>
               <button
@@ -187,11 +237,66 @@ const AdminWalletUpdate = () => {
                 Deposit
               </button>
             </form>
+            {depositMessage && (
+              <div className="bg-green-100 p-3 mt-4">{depositMessage}</div>
+            )}
+            {error && <div className="bg-red-100 p-3 mt-4">{error}</div>}
+          </div>
 
-            {/* Implement Withdraw Box similarly */}
-
-            {/* Message */}
-            {message && <div className="bg-green-100 p-3 mt-4">{message}</div>}
+          {/* Withdraw Box */}
+          <div className="w-[500px] mb-4 mt-8 p-6 bg-white rounded-lg shadow-xl">
+            <h2 className="text-2xl font-bold mb-6 text-center">
+              Admin Withdraw Wallet
+            </h2>
+            <form onSubmit={handleWithdraw} className="space-y-4">
+              <div>
+                <label
+                  htmlFor="withdrawAdminSelect"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Select Admin
+                </label>
+                <select
+                  id="withdrawAdminSelect"
+                  value={withdrawAdminId}
+                  onChange={(e) => setWithdrawAdminId(e.target.value)}
+                  className="mt-1 block w-full p-2 bg-white text-black border border-gray-600 rounded-md"
+                >
+                  <option value="">Select an admin</option>
+                  {admins.map((admin) => (
+                    <option key={admin.adminId} value={admin.adminId}>
+                      {admin.name} ({admin.email}) - Balance:{" "}
+                      {admin.walletBalance}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label
+                  htmlFor="withdrawAmount"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Withdraw Amount
+                </label>
+                <input
+                  type="number"
+                  id="withdrawAmount"
+                  value={withdrawAmount}
+                  onChange={(e) => setWithdrawAmount(e.target.value)}
+                  required
+                  className="mt-1 block w-full p-2 bg-white text-black border border-gray-600 rounded-md"
+                />
+              </div>
+              <button
+                type="submit"
+                className="w-full py-3 px-4 bg-red-600 text-white rounded-md"
+              >
+                Withdraw
+              </button>
+            </form>
+            {withdrawMessage && (
+              <div className="bg-green-100 p-3 mt-4">{withdrawMessage}</div>
+            )}
             {error && <div className="bg-red-100 p-3 mt-4">{error}</div>}
           </div>
         </div>
