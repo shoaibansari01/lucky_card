@@ -1,14 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Navbar from "./Navbar";
-
 export default function Algorithm() {
   const [selectedOption, setSelectedOption] = useState("");
-
+  useEffect(() => {
+    // Check if token exists, if not redirect to login page
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      window.location.replace("http://localhost:3000"); // Redirect to login page
+    }
+  }, []);
   const handleSelectChange = (event) => {
     const value = event.target.value;
     setSelectedOption(value);
-
     if (value) {
       axios
         .post(
@@ -25,7 +29,6 @@ export default function Algorithm() {
         });
     }
   };
-
   return (
     <>
       <Navbar />
