@@ -4,8 +4,12 @@ import Navbar from "./Navbar";
 import Constant from "../utils/Constant";
 import Modal from "./Modal"; // Import the modal component
 
+
+
+
 function AdminData() {
   const [data, setData] = useState([]);
+const [isPopupOpen, setPopupOpen] = useState(false);
   const [isModalOpen, setModalOpen] = useState(false);
   const [actionType, setActionType] = useState("");
   const [selectedEmail, setSelectedEmail] = useState("");
@@ -40,6 +44,19 @@ function AdminData() {
         console.error("Error fetching:", error);
       });
   }, []);
+
+  //  Function to handle opening of the static popup
+
+  const handleCheckDetails = (admin) => {
+    setSelectedAdmin(admin); // Set the selected admin to display their details
+    setPopupOpen(true); // Open the popup
+  };
+
+  // Function to close the popup
+  const closePopup = () => {
+    setPopupOpen(false); // Close the popup
+    setSelectedAdmin(null); // Clear selected admin details
+  };
 
   const handleDelete = (adminId) => {
     if (!checkAuthToken()) return; // Ensure user is authenticated before proceeding
@@ -132,6 +149,9 @@ function AdminData() {
                     Wallet Balance
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Admin Data
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
@@ -150,6 +170,14 @@ function AdminData() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       ₹{item.walletBalance}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <button
+                        className="mr-2 text-white bg-green-600 hover:bg-green-700 font-semibold py-1 px-2 rounded"
+                        onClick={() => handleCheckDetails(item)}
+                      >
+                        Check Details
+                      </button>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       <button
@@ -178,6 +206,57 @@ function AdminData() {
           <div className="mt-4 text-gray-500">No admin data available.</div>
         )}
       </div>
+
+        {/* Static Popup */}
+      {isPopupOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
+          <div className="bg-white p-6 rounded-lg w-[480px]">
+            <h2 className="text-xl font-semibold mb-4">Admin Game Details</h2>
+            <table className="min-w-full text-left border border-gray-300">
+              <thead>
+                <tr>
+                  <th className="border px-4 py-2 text-xs font-semibold text-gray-600">Game ID</th>
+                  <th className="border px-2 py-1 text-xs font-semibold text-gray-600">Bets</th>
+                  <th className="border px-2 py-1 text-xs font-semibold text-gray-600">Lose</th>
+                  <th className="border px-2 py-1 text-xs font-semibold text-gray-600">Win</th>
+                  <th className="border px-7 py-1 text-xs font-semibold text-gray-600">Time</th>
+                  <th className="border px-7 py-1 text-xs font-semibold text-gray-600">Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {/* Sample Row 1 */}
+                <tr>
+                  <td className="border px-2 py-1">G001</td>
+                  <td className="border px-2 py-1">₹500</td>
+                  <td className="border px-2 py-1">₹100</td>
+                  <td className="border px-2 py-1">₹400</td>
+                  <td className="border px-2 py-1">10:00 AM</td>
+                  <td className="border px-2 py-1">2024-10-17</td>
+                </tr>
+                {/* Sample Row 2 */}
+                <tr>
+                  <td className="border px-2 py-1">G002</td>
+                  <td className="border px-2 py-1">₹700</td>
+                  <td className="border px-2 py-1">₹200</td>
+                  <td className="border px-2 py-1">₹500</td>
+                  <td className="border px-2 py-1">1:00 PM</td>
+                  <td className="border px-2 py-1">2024-10-17</td>
+                </tr>
+                {/* Add more rows as needed */}
+              </tbody>
+            </table>
+            <button
+              className="mt-4 bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded"
+              onClick={closePopup}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
+
+
       <Modal
         isOpen={isModalOpen}
         onClose={() => setModalOpen(false)}
@@ -189,3 +268,9 @@ function AdminData() {
 }
 
 export default AdminData;
+
+
+
+
+
+
