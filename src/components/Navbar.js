@@ -8,7 +8,7 @@ export default function Navbar() {
   const handleLogout = () => {
     localStorage.removeItem('authToken');
 
-    navigate('/'); L
+    navigate('/'); 
   };
 
   return (
