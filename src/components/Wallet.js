@@ -53,7 +53,7 @@ const AdminWalletUpdate = () => {
     try {
       const token = localStorage.getItem("authToken");
       const response = await fetch(
-        `https://lucky-card-backend.onrender.com/api/super-admin/wallet-history/${adminId}`,
+        `http://localhost:5000/api/super-admin/wallet-history/${adminId}`,
         {
           method: "GET",
           headers: {
