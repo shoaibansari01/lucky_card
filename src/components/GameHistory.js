@@ -22,8 +22,8 @@ const GameHistory = () => {
   const [gameHistoryData, setGameHistoryData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);  // Pagination state
-  const [rowsPerPage] = useState(8);  // Rows per page
+  const [currentPage, setCurrentPage] = useState(1);  
+  const [rowsPerPage] = useState(8);  
   const navigate = useNavigate();
 
   const fetchGameHistory = async () => {

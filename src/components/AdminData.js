@@ -2,8 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Navbar from "./Navbar";
 import Constant from "../utils/Constant";
-import Modal from "./Modal"; // Import the modal component
-
+import Modal from "./Modal"; 
 function AdminData() {
   const [data, setData] = useState([]);
   const [isPopupOpen, setPopupOpen] = useState(false);
@@ -11,22 +10,20 @@ function AdminData() {
   const [actionType, setActionType] = useState("");
   const [selectedEmail, setSelectedEmail] = useState("");
   const [selectedAdmin, setSelectedAdmin] = useState(null);
-  const [gameDetails, setGameDetails] = useState([]); // State to hold game details
+  const [gameDetails, setGameDetails] = useState([]); 
   const [adminId, setAdminId] = useState("");
 
-  // Function to check auth token and redirect if not present
   const checkAuthToken = () => {
     const token = localStorage.getItem("authToken");
     if (!token) {
-      window.location.replace("http://localhost:3000"); // Hard redirect
+      window.location.replace("http://localhost:3000"); 
       return false;
     }
     return true;
   };
 
   useEffect(() => {
-    if (!checkAuthToken()) return; // Check authToken on component mount
-    // Fetch data if token is valid
+    if (!checkAuthToken()) return; 
     axios
       .get(`${Constant.BASE_URL}/super-admin/all-admins`, {
         headers: {
@@ -41,7 +38,6 @@ function AdminData() {
       });
   }, []);
 
-  // Function to handle opening of the static popup
   const handleCheckDetails = async (admin) => {
     setSelectedAdmin(admin);
     setPopupOpen(true);
@@ -63,22 +59,21 @@ function AdminData() {
     }
   };
 
-  // Function to close the popup
   const closePopup = () => {
-    setPopupOpen(false); // Close the popup
-    setSelectedAdmin(null); // Clear selected admin details
-    setGameDetails([]); // Clear game details when closing
+    setPopupOpen(false); 
+    setSelectedAdmin(null); 
+    setGameDetails([]); 
   };
 
   const handleDelete = (adminId) => {
-    if (!checkAuthToken()) return; // Ensure user is authenticated before proceeding
+    if (!checkAuthToken()) return; 
     setSelectedEmail(adminId);
     setActionType("delete");
     setModalOpen(true);
   };
 
   const toggleBlockUnblock = (admin) => {
-    if (!checkAuthToken()) return; // Ensure user is authenticated before proceeding
+    if (!checkAuthToken()) return;
     setSelectedAdmin(admin);
     setSelectedEmail(admin.adminId);
     setActionType(admin.isBlocked ? "unblock" : "block");
@@ -88,7 +83,7 @@ function AdminData() {
   const confirmAction = async () => {
     const token = localStorage.getItem("authToken");
     if (!token) {
-      window.location.replace("http://localhost:3000"); // Redirect if token is missing
+      window.location.replace("http://localhost:3000"); 
       return;
     }
     let apiUrl = "";
@@ -109,7 +104,6 @@ function AdminData() {
           },
         }
       );
-      // Update state after action (delete or block/unblock)
       if (actionType === "delete") {
         setData((prevData) =>
           prevData.filter((item) => item.adminId !== selectedEmail)

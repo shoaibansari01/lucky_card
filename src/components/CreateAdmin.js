@@ -24,20 +24,19 @@ function SignUpPage() {
   useEffect(() => {
     const token = localStorage.getItem("authToken");
     if (!token) {
-      window.location.replace("http://localhost:3000"); // Redirect to login page if token is missing
+      window.location.replace("http://localhost:3000"); 
     }
   }, []);
   
-  // Function to check if authToken is present
   const checkAuthToken = () => {
     const token = localStorage.getItem("authToken");
     if (!token) {
-      window.location.replace("http://localhost:3000"); // Hard redirect to login page
+      window.location.replace("http://localhost:3000");
     }
   };
 
   useEffect(() => {
-    checkAuthToken(); // Check token on component mount
+    checkAuthToken(); 
   }, []);
 
   const handleSendOTP = async (e) => {

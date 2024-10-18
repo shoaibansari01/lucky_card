@@ -4,10 +4,9 @@ import Navbar from "./Navbar";
 export default function Algorithm() {
   const [selectedOption, setSelectedOption] = useState("");
   useEffect(() => {
-    // Check if token exists, if not redirect to login page
     const token = localStorage.getItem("authToken");
     if (!token) {
-      window.location.replace("http://localhost:3000"); // Redirect to login page
+      window.location.replace("http://localhost:3000"); 
     }
   }, []);
   const handleSelectChange = (event) => {
@@ -58,7 +57,7 @@ export default function Algorithm() {
           </div>
           <div className="flex justify-center">
             <button
-              onClick={() => console.log(`Selected Option: ${selectedOption}`)} // Optional button for testing
+              onClick={() => console.log(`Selected Option: ${selectedOption}`)} 
               className="mt-4 w-full py-2 px-4 bg-blue-600 text-white font-semibold rounded-md shadow hover:bg-blue-700 transition duration-150 ease-in-out"
             >
               Submit

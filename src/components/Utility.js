@@ -3,45 +3,41 @@ import Navbar from "./Navbar";
 import axios from "axios";
 
 export default function Utility() {
-  const [algorithmPercentage, setAlgorithmPercentage] = useState(85); // Actual percentage
-  const [tempAlgorithmPercentage, setTempAlgorithmPercentage] = useState(85); // Temporary input value
-  const [message, setMessage] = useState(""); // To display success/failure messages
-  const [loading, setLoading] = useState(false); // Loading state for fetch/update operations
-  const [updatedAt, setUpdatedAt] = useState(""); // For storing the last updated time
+  const [algorithmPercentage, setAlgorithmPercentage] = useState(); 
+  const [tempAlgorithmPercentage, setTempAlgorithmPercentage] = useState(); 
+  const [message, setMessage] = useState(""); 
+  const [loading, setLoading] = useState(false); 
+  const [updatedAt, setUpdatedAt] = useState(""); 
 
-  // On initial load, check for token and fetch algorithm percentage
   useEffect(() => {
     const token = localStorage.getItem("authToken");
     if (!token) {
-      window.location.replace("http://localhost:3000"); // Redirect if no auth token
+      window.location.replace("http://localhost:3000"); 
     } else {
-      fetchAlgorithmPercentage(); // Fetch percentage and last updated time
+      fetchAlgorithmPercentage();
     }
   }, []);
 
-  // Fetch percentage and last update time from the backend
   const fetchAlgorithmPercentage = async () => {
     try {
       setLoading(true);
       const response = await axios.get(
         "https://lucky-card-backend.onrender.com/api/super-admin/getPercentage",
         {
-          headers: { Authorization: `Bearer ${localStorage.getItem("authToken")}` }, // Pass auth token in headers
+          headers: { Authorization: `Bearer ${localStorage.getItem("authToken")}` }, 
         }
       );
 
-      // Check if updatedAt is a valid date and set it properly
       const backendUpdatedAt = response.data.updatedAt;
       const parsedDate = new Date(backendUpdatedAt);
 
-      // If the parsed date is invalid, show current time; otherwise, show backend date
       const validDate = isNaN(parsedDate.getTime())
         ? new Date().toLocaleString()
         : parsedDate.toLocaleString();
 
-      setAlgorithmPercentage(response.data.percentage); // Set the fetched percentage
-      setTempAlgorithmPercentage(response.data.percentage); // Set the temp value for input
-      setUpdatedAt(validDate); // Set the formatted date
+      setAlgorithmPercentage(response.data.percentage); 
+      setTempAlgorithmPercentage(response.data.percentage);
+      setUpdatedAt(validDate); 
       setLoading(false);
     } catch (error) {
       setMessage("Error fetching percentage. Please try again.");
@@ -49,27 +45,25 @@ export default function Utility() {
     }
   };
 
-  // Handle the input change for tempAlgorithmPercentage
   const handleTempAlgorithmPercentageChange = (e) => {
-    const value = Math.max(0, Math.min(100, e.target.value)); // Restrict value between 0-100
+    const value = Math.max(0, Math.min(100, e.target.value)); 
     setTempAlgorithmPercentage(value);
   };
 
-  // Handle the update percentage request
   const handleUpdatePercentage = async () => {
     try {
       setLoading(true);
       const response = await axios.put(
         "https://lucky-card-backend.onrender.com/api/super-admin/updatePercentage",
         {
-          percentage: tempAlgorithmPercentage, // Send the updated percentage
-          updatedAt: new Date().toISOString(), // Send the updated date (ISO format)
+          percentage: tempAlgorithmPercentage, 
+          updatedAt: new Date().toISOString(), 
         },
         {
-          headers: { Authorization: `Bearer ${localStorage.getItem("authToken")}` }, // Pass auth token in headers
+          headers: { Authorization: `Bearer ${localStorage.getItem("authToken")}` }, 
         }
       );
-      setAlgorithmPercentage(tempAlgorithmPercentage); // Update the actual percentage
+      setAlgorithmPercentage(tempAlgorithmPercentage); 
 
       const backendUpdatedAt = response.data.updatedAt;
       const parsedDate = new Date(backendUpdatedAt);
@@ -78,8 +72,8 @@ export default function Utility() {
         ? new Date().toLocaleString()
         : parsedDate.toLocaleString();
 
-      setUpdatedAt(validDate); // Set the formatted date
-      setMessage("Percentage updated successfully!"); // Success message
+      setUpdatedAt(validDate); 
+      setMessage("Percentage updated successfully!"); 
       setLoading(false);
     } catch (error) {
       setMessage("Failed to update percentage. Please try again.");
@@ -102,8 +96,8 @@ export default function Utility() {
               <div className="flex items-center justify-center mb-4">
                 <input
                   type="number"
-                  value={tempAlgorithmPercentage} // Controlled input value
-                  onChange={handleTempAlgorithmPercentageChange} // Handle changes
+                  value={tempAlgorithmPercentage} 
+                  onChange={handleTempAlgorithmPercentageChange}
                   className="border border-gray-300 rounded-md p-2 w-24 text-center"
                   placeholder="%"
                   min="0"
@@ -123,7 +117,7 @@ export default function Utility() {
                       fill="none"
                       strokeWidth="3"
                       strokeLinecap="round"
-                      strokeDasharray={`${algorithmPercentage}, 100`} // Dynamic percentage in circular progress
+                      strokeDasharray={`${algorithmPercentage}, 100`} 
                       d="M18 2.0845
                        a 15.9155 15.9155 0 0 1 0 31.831
                        a 15.9155 15.9155 0 0 1 0 -31.831"
@@ -139,7 +133,6 @@ export default function Utility() {
                 Update Percentage
               </button>
 
-              {/* Display last updated time */}
               {updatedAt && (
                 <div className="mt-4">
                   <p className="text-gray-500 text-sm">

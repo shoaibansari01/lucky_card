@@ -107,7 +107,7 @@ const AdminWalletUpdate = () => {
           `Deposit successful! New balance: ${data.newBalance}`
         );
         setDepositAmount("");
-        setDepositAdminId(""); // Resetting the selected admin ID after deposit
+        setDepositAdminId(""); 
 
         setAdmins((prevAdmins) =>
           prevAdmins.map((admin) =>
@@ -117,7 +117,7 @@ const AdminWalletUpdate = () => {
           )
         );
 
-        // Fetch wallet history after a deposit
+        
         await getWalletHistory();
       } else {
         setError(data.error || "An error occurred");
