@@ -214,28 +214,34 @@ function AdminData() {
       {/* Static Popup */}
       {isPopupOpen && (
         <div
-          className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50"
+          className="fixed inset-0 flex items-center pl-[460px]  bg-gray-900 bg-opacity-75 z-50"
           onClick={closePopup}
         >
-          <div className="bg-white p-6 rounded-lg w-[1100px] h-[500px] overflow-x-auto overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-            <h2 className="text-xl font-semibold mb-4">Admin Game Details</h2>
-            <div className="w-full h-full overflow-x-auto overflow-y-auto scrollbar-hide">
-              <table className="min-w-full text-left border border-gray-300">
-                <thead>
+          <div
+            className="bg-white p-8 rounded-lg shadow-xl max-w-5xl w-full h-[500px] overflow-hidden relative"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="text-2xl font-bold mb-6 text-gray-800">
+              Admin Game Details
+            </h2>
+
+            <div className="w-full h-[350px] overflow-auto scrollbar-hide rounded-lg mb-4 border border-gray-300">
+              <table className="min-w-full text-left border-collapse">
+                <thead className="bg-gray-100">
                   <tr>
-                    <th className="border px-4 py-2 text-xs font-semibold text-gray-600">
+                    <th className="border px-6 py-3 text-sm font-semibold text-gray-700">
                       Game ID
                     </th>
-                    <th className="border px-4 py-2 text-xs font-semibold text-gray-600">
+                    <th className="border px-6 py-3 text-sm font-semibold text-gray-700">
                       Admin ID
                     </th>
-                    <th className="border px-4 py-2 text-xs font-semibold text-gray-600">
+                    <th className="border px-6 py-3 text-sm font-semibold text-gray-700">
                       Winning Amount
                     </th>
-                    <th className="border px-4 py-2 text-xs font-semibold text-gray-600">
+                    <th className="border px-6 py-3 text-sm font-semibold text-gray-700">
                       Created At
                     </th>
-                    <th className="border px-4 py-2 text-xs font-semibold text-gray-600">
+                    <th className="border px-6 py-3 text-sm font-semibold text-gray-700">
                       Updated At
                     </th>
                   </tr>
@@ -243,16 +249,23 @@ function AdminData() {
                 <tbody>
                   {gameDetails.length > 0 ? (
                     gameDetails.map((game) => (
-                      <tr key={game._id}>
-                        <td className="border px-4 py-2">{game.gameId}</td>
-                        <td className="border px-4 py-2">{game.adminId}</td>
-                        <td className="border px-4 py-2">
+                      <tr
+                        key={game._id}
+                        className="hover:bg-gray-50 transition-colors duration-200"
+                      >
+                        <td className="border px-6 py-3 text-gray-800 text-sm">
+                          {game.gameId}
+                        </td>
+                        <td className="border px-6 py-3 text-gray-800 text-sm">
+                          {game.adminId}
+                        </td>
+                        <td className="border px-6 py-3 text-gray-800 text-sm">
                           ₹{game.winningAmount}
                         </td>
-                        <td className="border px-4 py-2">
+                        <td className="border px-6 py-3 text-gray-800 text-sm">
                           {new Date(game.createdAt).toLocaleString()}
                         </td>
-                        <td className="border px-4 py-2">
+                        <td className="border px-6 py-3 text-gray-800 text-sm">
                           {new Date(game.updatedAt).toLocaleString()}
                         </td>
                       </tr>
@@ -261,7 +274,7 @@ function AdminData() {
                     <tr>
                       <td
                         colSpan="5"
-                        className="border px-4 py-2 text-center text-gray-500"
+                        className="border px-6 py-3 text-center text-gray-500 text-sm"
                       >
                         No game details available.
                       </td>
@@ -270,8 +283,9 @@ function AdminData() {
                 </tbody>
               </table>
             </div>
+
             <button
-              className="mt-4 text-white bg-red-500 hover:bg-red-600 font-semibold py-2 px-4 rounded"
+              className="absolute bottom-3 right-6 bg-red-500 text-white hover:bg-red-600 font-semibold py-2 px-6 rounded-lg shadow-md "
               onClick={closePopup}
             >
               Close

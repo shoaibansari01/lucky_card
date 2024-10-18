@@ -99,9 +99,9 @@ const SuperAdmin = () => {
               onClick={togglePasswordVisibility}
             >
               {passwordVisible ? (
-                <RxEyeOpen className="text-md text-white" />
+                <RxEyeOpen className="text-md text-black" />
               ) : (
-                <FaEyeSlash className="text-md text-white" />
+                <FaEyeSlash className="text-md text-black" />
               )}
             </div>
           </div>

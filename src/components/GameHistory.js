@@ -3,72 +3,68 @@ import axios from "axios";
 import Navbar from "./Navbar";
 import { useNavigate } from 'react-router-dom';
 
-// Mapping of card numbers to icons or names
 const cardNumbers = {
-    'A001': 'Jheart',
-    'A002': 'Jspade',
-    'A003': 'Jdiamond',
-    'A004': 'Jclub',
-    'A005': 'Qheart',
-    'A006': 'Qspade',
-    'A007': 'Qdiamond',
-    'A008': 'Qclub',
-    'A009': 'Kheart',
-    'A010': 'Kspade',
-    'A011': 'Kdiamond',
-    'A012': 'Kclub'
+  'A001': 'Jheart',
+  'A002': 'Jspade',
+  'A003': 'Jdiamond',
+  'A004': 'Jclub',
+  'A005': 'Qheart',
+  'A006': 'Qspade',
+  'A007': 'Qdiamond',
+  'A008': 'Qclub',
+  'A009': 'Kheart',
+  'A010': 'Kspade',
+  'A011': 'Kdiamond',
+  'A012': 'Kclub'
 };
 
 const GameHistory = () => {
   const [gameHistoryData, setGameHistoryData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const navigate = useNavigate(); // React Router's navigate hook
+  const [currentPage, setCurrentPage] = useState(1);  // Pagination state
+  const [rowsPerPage] = useState(8);  // Rows per page
+  const navigate = useNavigate();
 
-  // Function to fetch game history data from the backend
   const fetchGameHistory = async () => {
     try {
       const token = localStorage.getItem("authToken");
       if (!token) {
-        // If token is not found, redirect to login
         navigate('/');
         return;
       }
 
-      const response = await axios.get(
-        "https://lucky-card-backend.onrender.com/api/super-admin/game-history", 
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await axios.get("https://lucky-card-backend.onrender.com/api/super-admin/game-history", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-      console.log("Game History Response:", response.data); // Log the entire response
-
-      // Access the games array from the response data
-      const fetchedData = response.data.data.games || []; // Default to empty array if games is undefined
-      console.log("Fetched Data:", fetchedData); // Log the fetched data
+      const fetchedData = response.data.data.games || [];
       setGameHistoryData(fetchedData);
     } catch (err) {
-      console.error("Error fetching game history:", err);
       setError("Failed to load game history.");
     } finally {
       setLoading(false);
     }
   };
 
-  // useEffect to check token and fetch game history
   useEffect(() => {
     const token = localStorage.getItem("authToken");
-    
     if (!token) {
-      // If token is missing, redirect to login page
       navigate('/');
     } else {
       fetchGameHistory();
     }
-  }, [navigate]); // Add navigate as a dependency to prevent issues with hooks
+  }, [navigate]);
+
+  // Pagination logic
+  const indexOfLastRow = currentPage * rowsPerPage;
+  const indexOfFirstRow = indexOfLastRow - rowsPerPage;
+  const currentRows = gameHistoryData.slice(indexOfFirstRow, indexOfLastRow);
+
+  // Change page
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>{error}</p>;
@@ -76,91 +72,67 @@ const GameHistory = () => {
   return (
     <>
       <Navbar />
-
-      <div className="max-w-8xl h-[91vh] mx-auto p-6  rounded-lg shadow-lg bg-gray-200">
+<div className="flex items-center justify-center bg-gray-200">
+      <div className="max-w-7xl h-[91vh]  p-6  rounded-lg ">
         <h1 className="text-3xl font-bold mb-6 text-gray-800">Game History</h1>
 
-        {/* Add the hide-scrollbar class here */}
-        <div className="border-b border-gray-200 shadow-md rounded-lg overflow-auto w-[1400px] hide-scrollbar">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+        <div className="border border-gray-300 shadow-md rounded-lg overflow-x-auto">
+          <table className="min-w-full table-auto text-left">
+            <thead className="bg-gray-100">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  ID
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Admin ID
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Date
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Tickets Sold
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Winning Amount
-                </th>   
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Cards
-                </th>
+                <th className="px-6 py-3 text-xs font-semibold text-gray-700 uppercase">ID</th>
+                <th className="px-6 py-3 text-xs font-semibold text-gray-700 uppercase">Admin ID</th>
+                <th className="px-6 py-3 text-xs font-semibold text-gray-700 uppercase">Date</th>
+                <th className="px-6 py-3 text-xs font-semibold text-gray-700 uppercase">Tickets Sold</th>
+                <th className="px-6 py-3 text-xs font-semibold text-gray-700 uppercase">Winning Amount</th>
+                <th className="px-6 py-3 text-xs font-semibold text-gray-700 uppercase">Cards</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {Array.isArray(gameHistoryData) && gameHistoryData.length > 0 ? (
-                gameHistoryData.map((game) => {
-                  console.log("Rendering Game:", game); // Log each game being rendered
-
-                  // Extracting the Bets data and mapping it to a string or value
-                  const ticketsSold = game.Bets.map(
-                    (bet) => bet.ticketsID
-                  ).join(", "); // Join ticket IDs into a string
-
-                  // Calculate winning amount by summing the Amount from cards in Bets
+              {currentRows.length > 0 ? (
+                currentRows.map((game) => {
+                  const ticketsSold = game.Bets.map(bet => bet.ticketsID).join(", ");
                   const winningAmount = game.Bets.reduce((total, bet) => {
                     return total + bet.card.reduce((acc, card) => acc + card.Amount, 0);
-                  }, 0); // Summing the Amount for each bet's cards
+                  }, 0);
 
-                  // Create a list of card icons
                   const cardIcons = game.Bets.flatMap(bet =>
                     bet.card.map(card => cardNumbers[card.cardNo] || card.cardNo)
-                  ).join(", "); // Join card icons into a string
+                  ).join(", ");
 
                   return (
                     <tr key={game._id}>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {game._id}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {game.Bets.length > 0 ? game.Bets[0].adminID : 'N/A'}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {new Date(game.createdAt).toLocaleDateString()}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {ticketsSold}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {winningAmount}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {cardIcons || 'No Cards'}
-                      </td>
+                      <td className="px-6 py-4 text-sm font-medium text-gray-900">{game._id}</td>
+                      <td className="px-6 py-4 text-sm text-gray-900">{game.Bets.length > 0 ? game.Bets[0].adminID : 'N/A'}</td>
+                      <td className="px-6 py-4 text-sm text-gray-900">{new Date(game.createdAt).toLocaleDateString()}</td>
+                      <td className="px-6 py-4 text-sm text-gray-900">{ticketsSold}</td>
+                      <td className="px-6 py-4 text-sm text-gray-900">{winningAmount}</td>
+                      <td className="px-6 py-4 text-sm text-gray-900">{cardIcons || 'No Cards'}</td>
                     </tr>
                   );
                 })
               ) : (
                 <tr>
-                  <td
-                    colSpan="6"
-                    className="px-6 py-4 text-center text-sm text-gray-500"
-                  >
-                    No game history available.
-                  </td>
+                  <td colSpan="6" className="px-6 py-4 text-center text-sm text-gray-500">No game history available.</td>
                 </tr>
               )}
             </tbody>
           </table>
         </div>
+
+        {/* Pagination controls */}
+        <div className="flex justify-center space-x-2 mt-4">
+          {Array.from({ length: Math.ceil(gameHistoryData.length / rowsPerPage) }, (_, i) => (
+            <button
+              key={i}
+              onClick={() => paginate(i + 1)}
+              className={`px-3 py-1 rounded ${currentPage === i + 1 ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-700'}`}
+            >
+              {i + 1}
+            </button>
+          ))}
+        </div>
+      </div>
       </div>
     </>
   );
